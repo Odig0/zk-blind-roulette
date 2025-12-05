@@ -86,16 +86,15 @@ export function HeroSection({ onEnterDashboard }: HeroSectionProps) {
       {/* Main headline */}
       <div className="text-center max-w-5xl mx-auto z-10">
         <h1 className="font-display text-5xl sm:text-7xl md:text-8xl lg:text-9xl tracking-tight mb-6 text-balance">
-          <span className="neon-gradient-text">LEARN</span>
+          <span className="neon-gradient-text">RAFFERO</span>
           <br />
-          <span className="text-foreground">WEB3 WALLETS</span>
+          <span className="text-foreground">ANONYMOUS</span>
           <br />
-          <span className="neon-gradient-text">FOR ARTISTS</span>
+          <span className="neon-gradient-text">RAFFLE</span>
         </h1>
 
         <p className="text-muted-foreground text-xl md:text-2xl max-w-2xl mx-auto mb-10 leading-relaxed">
-          Mint test tokens, transfer between wallets, and master blockchain transactions in a safe testnet
-          environment. Your creative journey into Web3 starts here—practice without risking real money.
+          Experience truly private raffles with zero-knowledge proofs. Spin the wheel, win prizes, and verify results—all while keeping winners completely anonymous. No public announcements, no data leaks. Winners check their status manually, ensuring complete privacy.
         </p>
 
         {/* <Button

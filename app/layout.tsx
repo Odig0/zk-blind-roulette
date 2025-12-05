@@ -11,9 +11,9 @@ const bebasNeue = Bebas_Neue({ weight: "400", subsets: ["latin"], variable: "--f
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" })
 
 export const metadata: Metadata = {
-  title: "Core Web3 Dashboard | Wonderland Style",
+  title: "Raffero | Anonymous Raffle System",
   description:
-    "A futuristic Web3 dashboard demonstrating blockchain integration with Wagmi, Viem, and RainbowKit on Sepolia testnet.",
+    "Raffero - Experience truly private raffles with zero-knowledge proofs on Scroll. Spin the wheel anonymously, win prizes without public announcements. Complete privacy guaranteed.",
   icons: {
     icon: "/logoEnaid.png",
     apple: "/logoEnaid.png",

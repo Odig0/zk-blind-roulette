@@ -9,7 +9,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit"
 import { useAccount, useChainId, useChains } from "wagmi"
 
 const navLinks = [
-  { href: "#hero", label: "ENAID" },
+  { href: "#hero", label: "RAFFERO" },
   { href: "#dashboard", label: "Dashboard" },
 ]
 
@@ -36,7 +36,7 @@ export function Navigation() {
               className="object-cover"
             />
           </div>
-          <span className="text-foreground font-semibold text-lg tracking-wide">ENAID</span>
+          <span className="text-foreground font-semibold text-lg tracking-wide">RAFFERO</span>
         </Link>
 
         {/* Desktop Navigation */}

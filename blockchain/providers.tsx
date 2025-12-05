@@ -70,8 +70,8 @@ export function Web3Provider({ children }: Web3ProviderProps) {
           showRecentTransactions={true}
           modalSize="wide"
           appInfo={{
-            appName: "ENAID - Learn Web3 Wallets for Artists",
-            learnMoreUrl: "https://ethereum.org/en/wallets/",
+            appName: "Raffero - Anonymous Raffle",
+            learnMoreUrl: "https://scroll.io/",
           }}
           theme={customTheme}
         >

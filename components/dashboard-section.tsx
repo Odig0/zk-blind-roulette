@@ -1,6 +1,7 @@
 "use client"
 
 import { WalletCard } from "./wallet-card"
+import { RouletteGame } from "./roulette"
 
 export function DashboardSection() {
   return (
@@ -16,10 +17,17 @@ export function DashboardSection() {
         <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/30 to-background/70" />
       </div>
 
-      <div className="max-w-7xl mx-auto relative z-10 flex items-center justify-center min-h-screen">
-        {/* Wallet Connection */}
-        <div className="w-full max-w-md">
-          <WalletCard />
+      <div className="max-w-7xl mx-auto relative z-10 space-y-12">
+        {/* Wallet Connection - Centered at top */}
+        <div className="flex justify-center">
+          <div className="w-full max-w-md">
+            <WalletCard />
+          </div>
+        </div>
+
+        {/* Roulette Game */}
+        <div className="mt-12">
+          <RouletteGame />
         </div>
       </div>
     </section>
