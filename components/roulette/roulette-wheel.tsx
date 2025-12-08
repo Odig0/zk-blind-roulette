@@ -4,26 +4,42 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 
 interface RouletteWheelProps {
-  totalPoints: number
+  userBalance: number
   rotation: number
   isAnimating: boolean
   onSpin: () => void
   onTransitionEnd: () => void
+  onVerify: () => void
   wheelRef: React.RefObject<HTMLDivElement | null>
+  hasSpunRecently: boolean
+  pendingVerification: boolean
+  verificationResult: { segment: number; value: number } | null
 }
 
 export function RouletteWheel({
-  totalPoints,
+  userBalance,
   rotation,
   isAnimating,
   onSpin,
   onTransitionEnd,
+  onVerify,
   wheelRef,
+  hasSpunRecently,
+  pendingVerification,
+  verificationResult,
 }: RouletteWheelProps) {
+  const prizeEmoji = verificationResult 
+    ? verificationResult.value === -1 
+      ? "🎉"
+      : verificationResult.value > 0
+      ? "🎊"
+      : "😔"
+    : null
+
   return (
     <div className="flex flex-col items-center gap-8">
       <h2 className="text-4xl font-display neon-gradient-text">
-        Points: {totalPoints}
+        BALANCE: ${userBalance}
       </h2>
 
       <div className="relative">
@@ -52,14 +68,64 @@ export function RouletteWheel({
         </div>
       </div>
 
-      <Button
-        onClick={onSpin}
-        disabled={isAnimating}
-        size="lg"
-        className="text-xl px-12 py-6 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-bold shadow-lg shadow-orange-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {isAnimating ? "SPINNING..." : "SPIN THE WHEEL"}
-      </Button>
+      <div className="flex flex-col gap-4 items-center">
+        <Button
+          onClick={onSpin}
+          disabled={isAnimating || pendingVerification}
+          size="lg"
+          className="text-xl px-12 py-6 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-bold shadow-lg shadow-orange-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isAnimating ? "SPINNING..." : "SPIN THE WHEEL"}
+        </Button>
+
+        {/* Verification section - shown after spin completes */}
+        {hasSpunRecently && !isAnimating && (
+          <div className="flex flex-col gap-3 items-center animate-in fade-in slide-in-from-bottom-4">
+            <p className="text-sm text-gray-300 italic">
+              ✨ Spin completed. Verify your result:
+            </p>
+            <Button
+              onClick={onVerify}
+              disabled={verificationResult !== null}
+              size="lg"
+              className="text-lg px-10 py-5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold shadow-lg shadow-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {verificationResult ? `${prizeEmoji} VERIFIED` : "VERIFY RESULT"}
+            </Button>
+            
+            {/* Result display - only shown privately to user */}
+            {verificationResult && (
+              <div className="mt-4 p-6 rounded-lg border-2 border-purple-500 bg-purple-900/30 backdrop-blur-sm text-center animate-in fade-in">
+                <p className="text-2xl font-bold mb-2">
+                  {prizeEmoji}
+                </p>
+                {verificationResult.value === -1 ? (
+                  <p className="text-green-400 text-lg font-bold">
+                    YOU WON A SPECIAL PRIZE! 🎁
+                  </p>
+                ) : verificationResult.value > 0 ? (
+                  <div>
+                    <p className="text-yellow-400 text-lg font-bold">
+                      YOU WON!
+                    </p>
+                    <p className="text-white mt-2">
+                      +${verificationResult.value}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-gray-400 text-lg font-bold">
+                    You didn't win this time
+                  </p>
+                )}
+                <p className="text-xs text-gray-500 mt-4 italic">
+                  This result is private and only you can see it
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
+

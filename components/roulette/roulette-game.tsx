@@ -2,30 +2,22 @@
 
 import { useState, useRef, useCallback } from "react"
 import { RouletteWheel } from "./roulette-wheel"
-import { PrizeShop } from "./prize-shop"
+import { ScheduledDraws } from "./scheduled-draws"
 import { useToast } from "@/hooks/use-toast"
 
-interface Prize {
-  id: number
-  name: string
-  price: number
-}
-
-const PRIZES: Prize[] = [
-  { id: 1, name: "Prize 1", price: 150 },
-  { id: 2, name: "Prize 2", price: 200 },
-  { id: 3, name: "Prize 3", price: 500 },
-  { id: 4, name: "Prize 4", price: 1000 },
-]
 
 // Points that can be won on the wheel (8 segments)
 const PRIZE_VALUES = [100, 200, 0, 500, 50, -1, 0, 150]
 
 export function RouletteGame() {
-  const [totalPoints, setTotalPoints] = useState(0)
+  const [userBalance, setUserBalance] = useState(500) // Starting balance
   const [rotation, setRotation] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
-  const [lastSegment, setLastSegment] = useState(0)
+  const [lastSegment, setLastSegment] = useState<number | null>(null)
+  const [hasSpunRecently, setHasSpunRecently] = useState(false)
+  const [pendingVerification, setPendingVerification] = useState(false)
+  const [verificationResult, setVerificationResult] = useState<{ segment: number; value: number } | null>(null)
+  const [activeBets, setActiveBets] = useState<{ drawId: number; amount: number }[]>([])
 
   const wheelRef = useRef<HTMLDivElement>(null)
   const currentPrizeRef = useRef(0)
@@ -33,7 +25,7 @@ export function RouletteGame() {
 
   const handleSpin = useCallback(() => {
     const degreesPerSegment = 360 / 8
-    const previousRotation = lastSegment * degreesPerSegment
+    const previousRotation = lastSegment !== null ? lastSegment * degreesPerSegment : 0
 
     // Random segment (0-7)
     const randomSegment = Math.floor(Math.random() * 8)
@@ -44,6 +36,8 @@ export function RouletteGame() {
 
     currentPrizeRef.current = PRIZE_VALUES[randomSegment]
     setLastSegment(randomSegment)
+    setPendingVerification(true)
+    setVerificationResult(null)
 
     // Start animation
     setRotation(previousRotation)
@@ -56,72 +50,89 @@ export function RouletteGame() {
 
   const handleTransitionEnd = useCallback(() => {
     setIsAnimating(false)
+    setHasSpunRecently(true)
+  }, [])
+
+  const handleVerify = useCallback(() => {
+    if (lastSegment === null || verificationResult !== null) return
 
     const prizeValue = currentPrizeRef.current
+    setVerificationResult({ segment: lastSegment, value: prizeValue })
+    setPendingVerification(false)
 
+    // Only add balance if verified (no public announcement)
     if (prizeValue >= 0) {
-      setTotalPoints((prev) => prev + prizeValue)
+      setUserBalance((prev) => prev + prizeValue)
     }
 
-    // Show result
+    // Show private result
     if (prizeValue === -1) {
       toast({
         title: "🎉 Congratulations!",
-        description: "You won a special prize!!!",
+        description: "You won a special prize! (Verified privately)",
       })
     } else if (prizeValue > 0) {
       toast({
         title: "🎊 You Won!",
-        description: `You earned ${prizeValue} points!`,
+        description: `You earned $${prizeValue} (Verified privately)`,
       })
     } else {
       toast({
         title: "😔 Try Again",
-        description: "Better luck next time...",
+        description: "Better luck next time... (Verified privately)",
         variant: "destructive",
       })
     }
-  }, [toast])
 
-  const handlePurchase = useCallback(
-    (index: number) => {
-      const prize = PRIZES[index]
+    // Reset after verification
+    setHasSpunRecently(false)
+  }, [lastSegment, verificationResult, toast])
 
-      if (prize.price <= totalPoints) {
-        setTotalPoints((prev) => prev - prize.price)
+  const handleBet = useCallback(
+    (drawId: number, amount: number) => {
+      if (amount > userBalance) {
         toast({
-          title: "✅ Purchase Successful!",
-          description: `You bought ${prize.name}`,
-        })
-      } else {
-        toast({
-          title: "⚠️ Insufficient Points",
-          description: "You don't have enough points to buy this item",
+          title: "⚠️ Insufficient Balance",
+          description: "You don't have enough money to place this bet",
           variant: "destructive",
         })
+        return
       }
+
+      setUserBalance((prev) => prev - amount)
+      setActiveBets((prev) => [...prev, { drawId, amount }])
+
+      toast({
+        title: "✅ Bet Placed!",
+        description: `You bet $${amount} on draw #${drawId}`,
+      })
     },
-    [totalPoints, toast]
+    [userBalance, toast]
   )
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full max-w-7xl mx-auto">
-      {/* Prize Shop */}
+      {/* Scheduled Draws */}
       <div className="lg:col-span-1">
-        <PrizeShop prizes={PRIZES} totalPoints={totalPoints} onPurchase={handlePurchase} />
+        <ScheduledDraws onBet={handleBet} userBalance={userBalance} />
       </div>
 
       {/* Roulette Wheel */}
       <div className="lg:col-span-2 flex items-center justify-center">
         <RouletteWheel
-          totalPoints={totalPoints}
+          userBalance={userBalance}
           rotation={rotation}
           isAnimating={isAnimating}
           onSpin={handleSpin}
           onTransitionEnd={handleTransitionEnd}
+          onVerify={handleVerify}
           wheelRef={wheelRef}
+          hasSpunRecently={hasSpunRecently}
+          pendingVerification={pendingVerification}
+          verificationResult={verificationResult}
         />
       </div>
     </div>
   )
 }
+
