@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react"
 import { Starfield } from "@/components/starfield"
 import { Navigation } from "@/components/navigation"
 import { HeroSection } from "@/components/hero-section"
+import { HowItWorksSection } from "@/components/how-it-works-section"
 import { DashboardSection } from "@/components/dashboard-section"
 import { Web3Provider } from "@/blockchain/providers"
 import { useWeb3Store, selectShowDashboard, selectSetShowDashboard } from "@/store/web3-store"
@@ -26,6 +27,7 @@ function AppContent() {
       <Starfield />
       <Navigation />
       <HeroSection onEnterDashboard={handleEnterDashboard} />
+      <HowItWorksSection />
       <section ref={dashboardRef}>
         <DashboardSection />
       </section>

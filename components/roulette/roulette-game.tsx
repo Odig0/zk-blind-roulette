@@ -111,26 +111,47 @@ export function RouletteGame() {
   )
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full max-w-7xl mx-auto">
-      {/* Scheduled Draws */}
-      <div className="lg:col-span-1">
-        <ScheduledDraws onBet={handleBet} userBalance={userBalance} />
+    <div className="w-full max-w-7xl mx-auto space-y-8">
+      {/* Demo Notice */}
+      <div className="glass-card p-6 border-cyan-500/30">
+        <div className="flex items-start gap-4">
+          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center">
+            <svg className="w-6 h-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <h3 className="text-lg font-semibold text-cyan-400 mb-2">🎰 Try the Wheel Demo</h3>
+            <p className="text-muted-foreground leading-relaxed">
+              This is a demonstration of how the app works. Spin the wheel and verify privately if you won. 
+              <span className="text-foreground font-medium"> Winners are never publicly revealed</span> — only you can check your result 
+              through personal verification with zero-knowledge proofs.
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* Roulette Wheel */}
-      <div className="lg:col-span-2 flex items-center justify-center">
-        <RouletteWheel
-          userBalance={userBalance}
-          rotation={rotation}
-          isAnimating={isAnimating}
-          onSpin={handleSpin}
-          onTransitionEnd={handleTransitionEnd}
-          onVerify={handleVerify}
-          wheelRef={wheelRef}
-          hasSpunRecently={hasSpunRecently}
-          pendingVerification={pendingVerification}
-          verificationResult={verificationResult}
-        />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Scheduled Draws */}
+        <div className="lg:col-span-1">
+          <ScheduledDraws onBet={handleBet} userBalance={userBalance} />
+        </div>
+
+        {/* Roulette Wheel */}
+        <div className="lg:col-span-2 flex items-center justify-center">
+          <RouletteWheel
+            userBalance={userBalance}
+            rotation={rotation}
+            isAnimating={isAnimating}
+            onSpin={handleSpin}
+            onTransitionEnd={handleTransitionEnd}
+            onVerify={handleVerify}
+            wheelRef={wheelRef}
+            hasSpunRecently={hasSpunRecently}
+            pendingVerification={pendingVerification}
+            verificationResult={verificationResult}
+          />
+        </div>
       </div>
     </div>
   )

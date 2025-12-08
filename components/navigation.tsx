@@ -9,7 +9,8 @@ import { ConnectButton } from "@rainbow-me/rainbowkit"
 import { useAccount, useChainId, useChains } from "wagmi"
 
 const navLinks = [
-  { href: "#hero", label: "RAFFERO" },
+  { href: "#how-it-works", label: "How It Works" },
+  { href: "/raffles", label: "Raffles" },
   { href: "#dashboard", label: "Dashboard" },
 ]
 

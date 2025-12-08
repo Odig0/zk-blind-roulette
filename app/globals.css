@@ -27,8 +27,8 @@
   --radius: 0.75rem;
 
   /* Custom neon colors */
-  --neon-pink: oklch(0.7 0.25 320);
-  --neon-purple: oklch(0.6 0.22 280);
+  --neon-cyan: oklch(0.65 0.18 200);
+  --neon-purple: oklch(0.45 0.20 285);
   --neon-orange: oklch(0.75 0.2 50);
   --neon-yellow: oklch(0.85 0.18 90);
 }
@@ -153,7 +153,7 @@
 
 /* Neon text gradient */
 .neon-gradient-text {
-  background: linear-gradient(135deg, #ff6b9d 0%, #8b5cf6 25%, #4DA6FF 60%, #ff9a3c 100%);
+  background: linear-gradient(135deg, #4dd4d4 0%, #6d3fb8 25%, #4DA6FF 60%, #ff9a3c 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

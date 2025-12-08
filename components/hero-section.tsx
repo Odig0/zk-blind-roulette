@@ -13,13 +13,13 @@ export function HeroSection({ onEnterDashboard }: HeroSectionProps) {
       {/* Artistic Background Layer 1 - Large ambient glows */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Large gradient spheres */}
-        <div className="absolute -top-48 -left-48 w-[600px] h-[600px] bg-gradient-to-br from-purple-600/60 via-pink-500/50 to-transparent rounded-full blur-[120px] animate-pulse-glow" />
+        <div className="absolute -top-48 -left-48 w-[600px] h-[600px] bg-gradient-to-br from-purple-900/60 via-cyan-700/40 to-transparent rounded-full blur-[120px] animate-pulse-glow" />
         <div
           className="absolute -bottom-48 -right-48 w-[700px] h-[700px] bg-gradient-to-tl from-orange-500/60 via-yellow-400/50 to-transparent rounded-full blur-[120px] animate-pulse-glow"
           style={{ animationDelay: "1.5s" }}
         />
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-blue-500/40 via-purple-500/45 to-pink-500/40 rounded-full blur-[140px] animate-pulse-glow"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-blue-500/40 via-purple-800/45 to-cyan-600/35 rounded-full blur-[140px] animate-pulse-glow"
           style={{ animationDelay: "3s" }}
         />
       </div>
@@ -31,7 +31,7 @@ export function HeroSection({ onEnterDashboard }: HeroSectionProps) {
           style={{ animationDelay: "0.5s" }}
         />
         <div
-          className="absolute top-[60%] right-[20%] w-80 h-80 bg-gradient-to-tl from-pink-500/55 to-purple-600/45 rounded-full blur-[90px] animate-float"
+          className="absolute top-[60%] right-[20%] w-80 h-80 bg-gradient-to-tl from-teal-700/50 to-purple-900/45 rounded-full blur-[90px] animate-float"
           style={{ animationDelay: "2s" }}
         />
         <div
@@ -39,14 +39,14 @@ export function HeroSection({ onEnterDashboard }: HeroSectionProps) {
           style={{ animationDelay: "1s" }}
         />
         <div
-          className="absolute top-[40%] right-[10%] w-56 h-56 bg-gradient-to-bl from-purple-400/50 to-pink-500/45 rounded-full blur-[75px] animate-float"
+          className="absolute top-[40%] right-[10%] w-56 h-56 bg-gradient-to-bl from-purple-700/50 to-blue-600/40 rounded-full blur-[75px] animate-float"
           style={{ animationDelay: "2.5s" }}
         />
       </div>
 
       {/* Artistic Background Layer 3 - Accent highlights */}
       <div className="absolute inset-0 overflow-hidden mix-blend-screen">
-        <div className="absolute top-[25%] right-[30%] w-32 h-32 bg-pink-400/60 rounded-full blur-[60px] animate-pulse-glow" />
+        <div className="absolute top-[25%] right-[30%] w-32 h-32 bg-purple-600/50 rounded-full blur-[60px] animate-pulse-glow" />
         <div
           className="absolute bottom-[35%] left-[25%] w-40 h-40 bg-cyan-400/55 rounded-full blur-[65px] animate-pulse-glow"
           style={{ animationDelay: "1s" }}
@@ -69,9 +69,9 @@ export function HeroSection({ onEnterDashboard }: HeroSectionProps) {
           <svg viewBox="0 0 80 128" className="w-full h-full">
             <defs>
               <linearGradient id="keyhole-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#ff6b9d" />
+                <stop offset="0%" stopColor="#4dd4d4" />
                 <stop offset="30%" stopColor="#4DA6FF" />
-                <stop offset="65%" stopColor="#c44dff" />
+                <stop offset="65%" stopColor="#8b5cf6" />
                 <stop offset="100%" stopColor="#ff9a3c" />
               </linearGradient>
             </defs>
