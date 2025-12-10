@@ -17,74 +17,80 @@ interface Draw {
 }
 
 interface ScheduledDrawsProps {
-  onBet: (drawId: number, amount: number) => void
+  onBet: (drawId: number, amount: number, drawTime: Date) => void
   userBalance: number
+  enteredDrawIds?: number[]
 }
 
-const UPCOMING_DRAWS: Draw[] = [
-  {
-    id: 1,
-    date: "2025-12-09",
-    time: "14:00",
-    betAmount: 10,
-    totalBettors: 45,
-    prizePool: 450,
-    status: "upcoming",
-  },
-  {
-    id: 2,
-    date: "2025-12-09",
-    time: "18:00",
-    betAmount: 25,
-    totalBettors: 32,
-    prizePool: 800,
-    status: "upcoming",
-  },
-  {
-    id: 3,
-    date: "2025-12-10",
-    time: "12:00",
-    betAmount: 50,
-    totalBettors: 18,
-    prizePool: 900,
-    status: "upcoming",
-  },
-  {
-    id: 4,
-    date: "2025-12-10",
-    time: "20:00",
-    betAmount: 100,
-    totalBettors: 12,
-    prizePool: 1200,
-    status: "upcoming",
-  },
-]
+// Function to generate draws for today and tomorrow (GMT-4)
+function generateUpcomingDraws(): Draw[] {
+  const draws: Draw[] = []
+  const now = new Date()
+  
+  // Convert current time to GMT-4 (Bolivia timezone)
+  const gmtMinus4Offset = -4 * 60 // -4 hours in minutes
+  const localOffset = now.getTimezoneOffset() // Local offset in minutes
+  const boliviaTime = new Date(now.getTime() + (localOffset + gmtMinus4Offset) * 60 * 1000)
+  
+  const currentHour = boliviaTime.getHours()
+  const currentMinute = boliviaTime.getMinutes()
+  
+  // Daily draw times (GMT-4)
+  const drawTimes = [
+    { hour: 9, minute: 0, label: "09:00" },
+    { hour: 12, minute: 0, label: "12:00" },
+    { hour: 15, minute: 0, label: "15:00" },
+  ]
+  
+  let drawId = 1
+  
+  // Helper to create a draw
+  const createDraw = (date: Date, timeSlot: typeof drawTimes[0], dayOffset: number) => {
+    const drawDate = new Date(date)
+    drawDate.setDate(drawDate.getDate() + dayOffset)
+    
+    const dateStr = drawDate.toISOString().split('T')[0]
+    
+    return {
+      id: drawId++,
+      date: dateStr,
+      time: timeSlot.label,
+      betAmount: [10, 25, 50][Math.floor(Math.random() * 3)],
+      totalBettors: Math.floor(Math.random() * 50) + 10,
+      prizePool: Math.floor(Math.random() * 1000) + 500,
+      status: "upcoming" as const,
+    }
+  }
+  
+  // Add today's remaining draws
+  drawTimes.forEach(timeSlot => {
+    const currentTimeInMinutes = currentHour * 60 + currentMinute
+    const drawTimeInMinutes = timeSlot.hour * 60 + timeSlot.minute
+    
+    // If draw time hasn't passed yet today
+    if (drawTimeInMinutes > currentTimeInMinutes) {
+      draws.push(createDraw(boliviaTime, timeSlot, 0))
+    }
+  })
+  
+  // Add all of tomorrow's draws
+  drawTimes.forEach(timeSlot => {
+    draws.push(createDraw(boliviaTime, timeSlot, 1))
+  })
+  
+  // Ensure we always have at least 3 draws (if it's after last draw of today, show all tomorrow's)
+  return draws.slice(0, 6)
+}
 
-export function ScheduledDraws({ onBet, userBalance }: ScheduledDrawsProps) {
+const UPCOMING_DRAWS: Draw[] = generateUpcomingDraws()
+
+export function ScheduledDraws({ onBet, userBalance, enteredDrawIds = [] }: ScheduledDrawsProps) {
   const [draws, setDraws] = useState<Draw[]>(UPCOMING_DRAWS)
   const [selectedDrawId, setSelectedDrawId] = useState<number | null>(null)
   const [betAmount, setBetAmount] = useState("")
 
   const selectedDraw = draws.find((d) => d.id === selectedDrawId)
   const canBet = selectedDraw && selectedDraw.status === "upcoming" && userBalance >= (selectedDraw.betAmount || 0)
-
-  const handlePlaceBet = () => {
-    if (!selectedDraw || !canBet) return
-
-    const amount = selectedDraw.betAmount
-    onBet(selectedDraw.id, amount)
-
-    // Update draw info
-    setDraws(
-      draws.map((d) =>
-        d.id === selectedDrawId
-          ? { ...d, totalBettors: d.totalBettors + 1, prizePool: d.prizePool + amount }
-          : d
-      )
-    )
-
-    setSelectedDrawId(null)
-  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -135,10 +141,9 @@ export function ScheduledDraws({ onBet, userBalance }: ScheduledDrawsProps) {
           {draws.map((draw) => (
             <div
               key={draw.id}
-              onClick={() => setSelectedDrawId(draw.id)}
-              className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${getStatusColor(
+              className={`p-4 rounded-lg border-2 transition-all ${getStatusColor(
                 draw.status
-              )} ${selectedDrawId === draw.id ? "ring-2 ring-cyan-500" : ""}`}
+              )}`}
             >
               <div className="flex justify-between items-start mb-2">
                 <div>
@@ -172,47 +177,49 @@ export function ScheduledDraws({ onBet, userBalance }: ScheduledDrawsProps) {
                   <p className="font-semibold text-orange-400">${draw.prizePool}</p>
                 </div>
               </div>
+
+              {/* Enter Raffle Button or Confirmation Message */}
+              {enteredDrawIds.includes(draw.id) ? (
+                <div className="mt-3 p-3 rounded-lg bg-gradient-to-r from-cyan-900/30 to-purple-900/30 border border-cyan-500/30">
+                  <p className="text-sm text-cyan-300 text-center font-medium">
+                    ✓ Entered • Draw executes at {draw.time} GMT-4
+                  </p>
+                </div>
+              ) : (
+                <Button
+                  onClick={() => {
+                    if (userBalance >= draw.betAmount) {
+                      // Parse draw time to create Date object (GMT-4)
+                      const [hours, minutes] = draw.time.split(':').map(Number)
+                      const drawDateTime = new Date(draw.date)
+                      drawDateTime.setHours(hours, minutes, 0, 0)
+                      
+                      onBet(draw.id, draw.betAmount, drawDateTime)
+                      setDraws(
+                        draws.map((d) =>
+                          d.id === draw.id
+                            ? { ...d, totalBettors: d.totalBettors + 1, prizePool: d.prizePool + draw.betAmount }
+                            : d
+                        )
+                      )
+                    }
+                  }}
+                  disabled={draw.status !== "upcoming" || userBalance < draw.betAmount}
+                  className="w-full bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600"
+                  size="sm"
+                >
+                  {draw.status !== "upcoming"
+                    ? "Draw Closed"
+                    : userBalance < draw.betAmount
+                    ? "Insufficient Balance"
+                    : "Enter Raffle 🎰"}
+                </Button>
+              )}
             </div>
           ))}
         </div>
 
-        {/* Bet Details */}
-        {selectedDraw && (
-          <div className="mt-6 pt-6 border-t border-gray-700">
-            <h3 className="font-bold mb-4">Place Bet</h3>
-            <div className="space-y-3">
-              <div className="p-4 rounded-lg bg-gray-900/50 border border-gray-700">
-                <p className="text-sm text-gray-400">Draw Date & Time</p>
-                <p className="font-bold text-white">
-                  {new Date(selectedDraw.date).toLocaleDateString()} at {selectedDraw.time}
-                </p>
-              </div>
-
-              <div className="p-4 rounded-lg bg-gray-900/50 border border-gray-700">
-                <p className="text-sm text-gray-400">Bet Amount</p>
-                <p className="font-bold text-orange-400 text-xl">${selectedDraw.betAmount}</p>
-              </div>
-
-              <div className="p-4 rounded-lg bg-gray-900/50 border border-gray-700">
-                <p className="text-sm text-gray-400">Current Prize Pool</p>
-                <p className="font-bold text-green-400 text-xl">${selectedDraw.prizePool}</p>
-              </div>
-
-              <Button
-                onClick={handlePlaceBet}
-                disabled={!canBet}
-                size="lg"
-                className="w-full text-lg font-bold mt-4"
-              >
-                {!canBet
-                  ? selectedDraw.status !== "upcoming"
-                    ? "Draw Closed"
-                    : "Insufficient Balance"
-                  : `Place Bet - $${selectedDraw.betAmount}`}
-              </Button>
-            </div>
-          </div>
-        )}
+        {/* Remove the old bet details section since we now have inline buttons */}
       </div>
     </Card>
   )

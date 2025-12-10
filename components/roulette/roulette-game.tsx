@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useCallback } from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
 import { RouletteWheel } from "./roulette-wheel"
 import { ScheduledDraws } from "./scheduled-draws"
 import { SuccessModal } from "@/components/success-modal"
@@ -10,6 +10,8 @@ import { useToast } from "@/hooks/use-toast"
 // Points that can be won on the wheel (8 segments)
 const PRIZE_VALUES = [100, 200, 0, 500, 50, -1, 0, 150]
 
+const STORAGE_KEY = "raffero_active_bets"
+
 export function RouletteGame() {
   const [userBalance, setUserBalance] = useState(500) // Starting balance
   const [rotation, setRotation] = useState(0)
@@ -18,12 +20,41 @@ export function RouletteGame() {
   const [hasSpunRecently, setHasSpunRecently] = useState(false)
   const [pendingVerification, setPendingVerification] = useState(false)
   const [verificationResult, setVerificationResult] = useState<{ segment: number; value: number } | null>(null)
-  const [activeBets, setActiveBets] = useState<{ drawId: number; amount: number }[]>([])
+  const [activeBets, setActiveBets] = useState<{ drawId: number; amount: number; drawTime: Date }[]>([])
   const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [hasScheduledDraw, setHasScheduledDraw] = useState(false)
 
   const wheelRef = useRef<HTMLDivElement>(null)
   const currentPrizeRef = useRef(0)
   const { toast } = useToast()
+
+  // Load active bets from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored)
+        // Convert drawTime strings back to Date objects
+        const bets = parsed.map((bet: any) => ({
+          ...bet,
+          drawTime: new Date(bet.drawTime)
+        }))
+        setActiveBets(bets)
+        setHasScheduledDraw(bets.length > 0)
+      } catch (error) {
+        console.error("Failed to parse stored bets:", error)
+      }
+    }
+  }, [])
+
+  // Save active bets to localStorage whenever they change
+  useEffect(() => {
+    if (activeBets.length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(activeBets))
+    } else {
+      localStorage.removeItem(STORAGE_KEY)
+    }
+  }, [activeBets])
 
   const handleSpin = useCallback(() => {
     const degreesPerSegment = 360 / 8
@@ -75,7 +106,7 @@ export function RouletteGame() {
   }, [lastSegment, verificationResult])
 
   const handleBet = useCallback(
-    (drawId: number, amount: number) => {
+    (drawId: number, amount: number, drawTime: Date) => {
       if (amount > userBalance) {
         toast({
           title: "⚠️ Insufficient Balance",
@@ -86,11 +117,12 @@ export function RouletteGame() {
       }
 
       setUserBalance((prev) => prev - amount)
-      setActiveBets((prev) => [...prev, { drawId, amount }])
+      setActiveBets((prev) => [...prev, { drawId, amount, drawTime }])
+      setHasScheduledDraw(true)
 
       toast({
-        title: "✅ Bet Placed!",
-        description: `You bet $${amount} on draw #${drawId}`,
+        title: "✅ Entered Raffle!",
+        description: `You're in! The wheel will spin automatically at the scheduled time.`,
       })
     },
     [userBalance, toast]
@@ -120,7 +152,11 @@ export function RouletteGame() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
         {/* Scheduled Draws */}
         <div className="lg:col-span-1 order-2 lg:order-1">
-          <ScheduledDraws onBet={handleBet} userBalance={userBalance} />
+          <ScheduledDraws 
+            onBet={handleBet} 
+            userBalance={userBalance}
+            enteredDrawIds={activeBets.map(bet => bet.drawId)}
+          />
         </div>
 
         {/* Roulette Wheel */}
@@ -136,6 +172,7 @@ export function RouletteGame() {
             hasSpunRecently={hasSpunRecently}
             pendingVerification={pendingVerification}
             verificationResult={verificationResult}
+            isDisabled={hasScheduledDraw}
           />
         </div>
       </div>

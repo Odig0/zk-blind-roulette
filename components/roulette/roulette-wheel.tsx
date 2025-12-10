@@ -14,6 +14,7 @@ interface RouletteWheelProps {
   hasSpunRecently: boolean
   pendingVerification: boolean
   verificationResult: { segment: number; value: number } | null
+  isDisabled?: boolean
 }
 
 export function RouletteWheel({
@@ -27,6 +28,7 @@ export function RouletteWheel({
   hasSpunRecently,
   pendingVerification,
   verificationResult,
+  isDisabled = false,
 }: RouletteWheelProps) {
   const prizeEmoji = verificationResult 
     ? verificationResult.value === -1 
