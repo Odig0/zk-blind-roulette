@@ -117,15 +117,19 @@ export function ScheduledDraws({ onBet, userBalance }: ScheduledDrawsProps) {
   }
 
   return (
-    <Card className="glass-card h-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-2xl">
-          <Calendar className="h-6 w-6 text-neon-pink" />
-          Scheduled Draws
-        </CardTitle>
-        <p className="text-sm text-gray-400 mt-2">Your Balance: ${userBalance}</p>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <Card className="glass-card h-full p-4 sm:p-5 md:p-6">
+      <div className="space-y-4 sm:space-y-5 md:space-y-6">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-cyan-400" />
+          <h2 className="text-lg sm:text-xl font-semibold">Scheduled Draws</h2>
+        </div>
+
+        {/* Balance Display */}
+        <div className="p-3 sm:p-4 rounded-lg bg-background/50 border border-border">
+          <p className="text-xs sm:text-sm text-muted-foreground mb-1">Your Balance:</p>
+          <p className="text-xl sm:text-2xl font-bold neon-gradient-text">${userBalance}</p>
+        </div>
+
         {/* Draws List */}
         <div className="space-y-3 max-h-[500px] overflow-y-auto">
           {draws.map((draw) => (
@@ -134,7 +138,7 @@ export function ScheduledDraws({ onBet, userBalance }: ScheduledDrawsProps) {
               onClick={() => setSelectedDrawId(draw.id)}
               className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${getStatusColor(
                 draw.status
-              )} ${selectedDrawId === draw.id ? "ring-2 ring-neon-pink" : ""}`}
+              )} ${selectedDrawId === draw.id ? "ring-2 ring-cyan-500" : ""}`}
             >
               <div className="flex justify-between items-start mb-2">
                 <div>
@@ -151,7 +155,7 @@ export function ScheduledDraws({ onBet, userBalance }: ScheduledDrawsProps) {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-neon-orange flex items-center gap-1">
+                  <p className="font-bold text-orange-400 flex items-center gap-1">
                     <DollarSign className="h-4 w-4" />
                     {draw.betAmount}
                   </p>
@@ -165,7 +169,7 @@ export function ScheduledDraws({ onBet, userBalance }: ScheduledDrawsProps) {
                 </div>
                 <div>
                   <p className="text-gray-500">Prize Pool</p>
-                  <p className="font-semibold text-neon-orange">${draw.prizePool}</p>
+                  <p className="font-semibold text-orange-400">${draw.prizePool}</p>
                 </div>
               </div>
             </div>
@@ -186,7 +190,7 @@ export function ScheduledDraws({ onBet, userBalance }: ScheduledDrawsProps) {
 
               <div className="p-4 rounded-lg bg-gray-900/50 border border-gray-700">
                 <p className="text-sm text-gray-400">Bet Amount</p>
-                <p className="font-bold text-neon-orange text-xl">${selectedDraw.betAmount}</p>
+                <p className="font-bold text-orange-400 text-xl">${selectedDraw.betAmount}</p>
               </div>
 
               <div className="p-4 rounded-lg bg-gray-900/50 border border-gray-700">
@@ -198,7 +202,7 @@ export function ScheduledDraws({ onBet, userBalance }: ScheduledDrawsProps) {
                 onClick={handlePlaceBet}
                 disabled={!canBet}
                 size="lg"
-                className="w-full text-lg font-bold mt-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full text-lg font-bold mt-4"
               >
                 {!canBet
                   ? selectedDraw.status !== "upcoming"
@@ -209,7 +213,7 @@ export function ScheduledDraws({ onBet, userBalance }: ScheduledDrawsProps) {
             </div>
           </div>
         )}
-      </CardContent>
+      </div>
     </Card>
   )
 }

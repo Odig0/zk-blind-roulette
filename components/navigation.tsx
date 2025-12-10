@@ -9,7 +9,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit"
 import { useAccount, useChainId, useChains } from "wagmi"
 
 const navLinks = [
-  { href: "#how-it-works", label: "How It Works" },
+  { href: "/how-it-works", label: "How It Works" },
   { href: "/raffles", label: "Raffles" },
   { href: "#dashboard", label: "Dashboard" },
 ]
@@ -24,7 +24,7 @@ export function Navigation() {
   const currentChain = chains.find(c => c.id === chainId)
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-4 py-4 md:px-8">
+    <nav className="fixed top-0 left-0 right-0 z-50 px-3 py-3 sm:px-4 sm:py-4 md:px-8 bg-background/80 backdrop-blur-md border-b border-border/50">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">

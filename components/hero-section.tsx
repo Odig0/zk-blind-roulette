@@ -9,11 +9,11 @@ interface HeroSectionProps {
 
 export function HeroSection({ onEnterDashboard }: HeroSectionProps) {
   return (
-    <section id="hero" className="relative min-h-screen flex flex-col items-center justify-center px-4 overflow-hidden">
+    <section id="hero" className="relative min-h-[100svh] flex flex-col items-center justify-center px-4 py-8 overflow-hidden">
       {/* Artistic Background Layer 1 - Large ambient glows */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Large gradient spheres */}
-        <div className="absolute -top-48 -left-48 w-[600px] h-[600px] bg-gradient-to-br from-purple-900/60 via-cyan-700/40 to-transparent rounded-full blur-[120px] animate-pulse-glow" />
+        <div className="absolute -top-24 -left-24 sm:-top-48 sm:-left-48 w-[300px] h-[300px] sm:w-[600px] sm:h-[600px] bg-gradient-to-br from-purple-900/60 via-cyan-700/40 to-transparent rounded-full blur-[80px] sm:blur-[120px] animate-pulse-glow" />
         <div
           className="absolute -bottom-48 -right-48 w-[700px] h-[700px] bg-gradient-to-tl from-orange-500/60 via-yellow-400/50 to-transparent rounded-full blur-[120px] animate-pulse-glow"
           style={{ animationDelay: "1.5s" }}
@@ -64,8 +64,8 @@ export function HeroSection({ onEnterDashboard }: HeroSectionProps) {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.3)_70%,rgba(0,0,0,0.6)_100%)]" />
 
       {/* Keyhole icon */}
-      <div className="relative mb-8 animate-float">
-        <div className="w-20 h-32 relative">
+      <div className="relative mb-6 sm:mb-8 animate-float">
+        <div className="w-12 h-20 sm:w-20 sm:h-32 relative">
           <svg viewBox="0 0 80 128" className="w-full h-full">
             <defs>
               <linearGradient id="keyhole-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -84,8 +84,8 @@ export function HeroSection({ onEnterDashboard }: HeroSectionProps) {
       </div>
 
       {/* Main headline */}
-      <div className="text-center max-w-5xl mx-auto z-10">
-        <h1 className="font-display text-5xl sm:text-7xl md:text-8xl lg:text-9xl tracking-tight mb-6 text-balance">
+      <div className="text-center max-w-5xl mx-auto z-10 px-4">
+        <h1 className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight mb-4 sm:mb-6 text-balance leading-tight">
           <span className="neon-gradient-text">RAFFERO</span>
           <br />
           <span className="text-foreground">ANONYMOUS</span>
@@ -93,7 +93,7 @@ export function HeroSection({ onEnterDashboard }: HeroSectionProps) {
           <span className="neon-gradient-text">RAFFLE</span>
         </h1>
 
-        <p className="text-muted-foreground text-xl md:text-2xl max-w-2xl mx-auto mb-10 leading-relaxed">
+        <p className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed px-2">
           Experience truly private raffles with zero-knowledge proofs. Spin the wheel, win prizes, and verify results—all while keeping winners completely anonymous. No public announcements, no data leaks. Winners check their status manually, ensuring complete privacy.
         </p>
 

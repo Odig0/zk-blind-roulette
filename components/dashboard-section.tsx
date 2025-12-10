@@ -2,10 +2,15 @@
 
 import { WalletCard } from "./wallet-card"
 import { RouletteGame } from "./roulette"
+import { OnboardingFlow } from "./onboarding-flow"
+import { ScrollBadges } from "./scroll-badges"
+import { useAccount } from "wagmi"
 
 export function DashboardSection() {
+  const { isConnected } = useAccount()
+  
   return (
-    <section id="dashboard" className="relative min-h-screen px-4 py-20 md:px-8 overflow-hidden">
+    <section id="dashboard" className="relative min-h-[100svh] px-3 py-12 sm:px-4 sm:py-16 md:px-8 md:py-20 overflow-hidden">
       {/* Wonderland-inspired gradient background */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {/* Animated gradient orbs */}
@@ -17,10 +22,20 @@ export function DashboardSection() {
         <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/30 to-background/70" />
       </div>
 
-      <div className="max-w-7xl mx-auto relative z-10 space-y-12">
+      <div className="max-w-7xl mx-auto relative z-10 space-y-6 sm:space-y-8 md:space-y-12">
+        {/* Scroll Benefits Badges */}
+        <ScrollBadges />
+
+        {/* Onboarding Flow */}
+        <OnboardingFlow 
+          isConnected={isConnected} 
+          balance={500} 
+          onComplete={() => {}} 
+        />
+
         {/* Wallet Connection - Centered at top */}
         <div className="flex justify-center">
-          <div className="w-full max-w-md">
+          <div className="w-full max-w-md px-2">
             <WalletCard />
           </div>
         </div>

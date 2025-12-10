@@ -37,14 +37,15 @@ export function RouletteWheel({
     : null
 
   return (
-    <div className="flex flex-col items-center gap-8">
-      <h2 className="text-4xl font-display neon-gradient-text">
+    <div className="flex flex-col items-center gap-4 sm:gap-6 md:gap-8 w-full">
+      <h2 className="text-2xl sm:text-3xl md:text-4xl font-display neon-gradient-text">
         BALANCE: ${userBalance}
       </h2>
 
-      <div className="relative">
+      <div className="relative w-full max-w-[280px] sm:max-w-sm md:max-w-md">
         <div
           ref={wheelRef}
+          className="w-full aspect-square"
           style={{
             transform: `rotate(${rotation}deg)`,
             transition: isAnimating ? "transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)" : "none",

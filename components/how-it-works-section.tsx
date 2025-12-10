@@ -40,7 +40,7 @@ export function HowItWorksSection() {
   ]
 
   return (
-    <section id="how-it-works" className="relative min-h-screen px-4 py-20 md:px-8 flex items-center">
+    <section id="how-it-works" className="relative min-h-[100svh] px-4 py-16 sm:py-20 md:px-8 flex items-center">
       {/* Background Effects - Same as hero */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-48 -left-48 w-[600px] h-[600px] bg-gradient-to-br from-purple-900/60 via-cyan-700/40 to-transparent rounded-full blur-[120px] animate-pulse-glow" />
@@ -56,33 +56,33 @@ export function HowItWorksSection() {
 
       <div className="max-w-7xl mx-auto relative z-10 w-full">
         {/* Header */}
-        <div className="text-center mb-16 space-y-4">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold">
+        <div className="text-center mb-10 sm:mb-12 md:mb-16 space-y-3 sm:space-y-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold">
             <span className="neon-gradient-text">How It Works</span>
           </h2>
-          <p className="text-muted-foreground text-lg md:text-xl max-w-3xl mx-auto">
+          <p className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-3xl mx-auto px-4">
             Create custom raffles or join scheduled draws. Experience truly anonymous and fair prize distribution powered by blockchain technology.
           </p>
         </div>
 
         {/* Features Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
           {features.map((feature, index) => {
             const Icon = feature.icon
             return (
               <Card
                 key={index}
-                className={`glass-card p-6 hover:border-opacity-70 transition-all duration-300 group ${feature.borderColor}`}
+                className={`glass-card p-4 sm:p-5 md:p-6 hover:border-opacity-70 transition-all duration-300 group ${feature.borderColor}`}
               >
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {/* Icon */}
-                  <div className={`w-12 h-12 rounded-lg ${feature.bgColor} border ${feature.borderColor} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                    <Icon className={`h-6 w-6 ${feature.color}`} />
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg ${feature.bgColor} border ${feature.borderColor} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                    <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${feature.color}`} />
                   </div>
 
                   {/* Content */}
-                  <div className="space-y-2">
-                    <h3 className={`font-semibold text-lg ${feature.color}`}>
+                  <div className="space-y-1 sm:space-y-2">
+                    <h3 className={`font-semibold text-base sm:text-lg ${feature.color}`}>
                       {feature.title}
                     </h3>
                     <p className="text-muted-foreground text-sm leading-relaxed">

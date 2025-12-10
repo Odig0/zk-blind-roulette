@@ -65,11 +65,11 @@ export function RaffleCard({
   }
 
   return (
-    <Card className="glass-card p-4 hover:border-cyan-500/50 transition-all duration-300 group">
-      <div className="space-y-3">
+    <Card className="glass-card p-3 sm:p-4 hover:border-cyan-500/50 transition-all duration-300 group">
+      <div className="space-y-2 sm:space-y-3">
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-lg line-clamp-2 group-hover:text-cyan-400 transition-colors">
+          <h3 className="font-semibold text-base sm:text-lg line-clamp-2 group-hover:text-cyan-400 transition-colors">
             {title}
           </h3>
           {getStatusBadge()}
