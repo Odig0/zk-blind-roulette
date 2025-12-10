@@ -19,6 +19,7 @@ const nextConfig = {
       zlib: false,
       path: false,
       os: false,
+      '@react-native-async-storage/async-storage': false,
     }
     
     // External modules that should not be bundled
@@ -27,7 +28,8 @@ const nextConfig = {
       'lokijs', 
       'encoding',
       '@gemini-wallet/core',
-      'porto'
+      'porto',
+      '@react-native-async-storage/async-storage'
     )
     
     // Ignore pino and related packages on client side
