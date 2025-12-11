@@ -1,13 +1,16 @@
 import { http, createConfig } from "wagmi"
 import { sepolia, mainnet, polygon, arbitrum, optimism, base, scrollSepolia } from "wagmi/chains"
-import { injected, metaMask, coinbaseWallet } from "wagmi/connectors"
+import { injected } from "wagmi/connectors"
 import type { CreateConnectorFn } from "wagmi"
 
-// Lazy load WalletConnect only on client side
+// Lazy load all wallet connectors on client side to avoid SSR issues
 let walletConnectConnector: CreateConnectorFn | null = null
+let metaMaskConnector: CreateConnectorFn | null = null
+let coinbaseConnector: CreateConnectorFn | null = null
 
 if (typeof window !== 'undefined') {
-  const { walletConnect } = require('wagmi/connectors')
+  const { walletConnect, metaMask, coinbaseWallet } = require('wagmi/connectors')
+  
   walletConnectConnector = walletConnect({ 
     projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
     showQrModal: true,
@@ -21,19 +24,17 @@ if (typeof window !== 'undefined') {
       themeMode: 'dark' as const,
     },
   })
+  
+  metaMaskConnector = metaMask()
+  coinbaseConnector = coinbaseWallet({ appName: "Raffero" })
 }
 
-// Build connectors array based on environment
-const connectors: CreateConnectorFn[] = [
-  injected(),
-  metaMask(),
-  coinbaseWallet({ appName: "Raffero" }),
-]
+// Build connectors array - injected always works, others only on client
+const connectors: CreateConnectorFn[] = [injected()]
 
-// Add WalletConnect only on client
-if (walletConnectConnector) {
-  connectors.splice(1, 0, walletConnectConnector)
-}
+if (walletConnectConnector) connectors.push(walletConnectConnector)
+if (metaMaskConnector) connectors.push(metaMaskConnector)
+if (coinbaseConnector) connectors.push(coinbaseConnector)
 
 // Wagmi configuration with multiple chains
 export const config = createConfig({
