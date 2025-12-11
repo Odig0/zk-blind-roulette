@@ -42,7 +42,6 @@ export function RouletteGame() {
         setActiveBets(bets)
         setHasScheduledDraw(bets.length > 0)
       } catch (error) {
-        console.error("Failed to parse stored bets:", error)
       }
     }
   }, [])

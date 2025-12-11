@@ -4,39 +4,30 @@ import { useEffect } from "react"
 
 export function ErrorHandler() {
   useEffect(() => {
-    // Suppress errors from browser extensions
-    const originalError = console.error
-    console.error = (...args) => {
-      const message = args[0]?.toString() || ""
-      
-      // Ignore extension-related errors
-      if (
-        message.includes("chrome-extension://") ||
-        message.includes("has not been authorized yet") ||
-        message.includes("Extension context invalidated")
-      ) {
-        return
-      }
-      
-      originalError.apply(console, args)
-    }
+    // Only suppress errors in production
+    if (process.env.NODE_ENV === "production") {
+      const originalError = console.error
+      const originalWarn = console.warn
+      const originalLog = console.log
 
-    // Handle unhandled promise rejections from extensions
-    const handleRejection = (event: PromiseRejectionEvent) => {
-      const reason = event.reason?.toString() || ""
-      if (
-        reason.includes("chrome-extension://") ||
-        reason.includes("has not been authorized yet")
-      ) {
+      // Suppress all console outputs in production
+      console.error = () => {}
+      console.warn = () => {}
+      console.log = () => {}
+
+      // Handle unhandled promise rejections silently
+      const handleRejection = (event: PromiseRejectionEvent) => {
         event.preventDefault()
       }
-    }
 
-    window.addEventListener("unhandledrejection", handleRejection)
+      window.addEventListener("unhandledrejection", handleRejection)
 
-    return () => {
-      console.error = originalError
-      window.removeEventListener("unhandledrejection", handleRejection)
+      return () => {
+        console.error = originalError
+        console.warn = originalWarn
+        console.log = originalLog
+        window.removeEventListener("unhandledrejection", handleRejection)
+      }
     }
   }, [])
 

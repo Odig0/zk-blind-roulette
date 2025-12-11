@@ -36,7 +36,7 @@ export function parseFormattedNumber(value: string | number): number {
     
     return parsed * multiplier
   } catch (error) {
-    console.error(`Error parsing formatted number: "${value}"`, error)
+    // console.error(`Error parsing formatted number: "${value}"`, error)
     return 0
   }
 }
@@ -63,7 +63,6 @@ export function parseSafeBalance(balance: string | number): number {
     const parsed = parseFormattedNumber(balance)
     return isNaN(parsed) ? 0 : parsed
   } catch (error) {
-    console.error('Error parsing balance:', balance, error)
     return 0
   }
 }
