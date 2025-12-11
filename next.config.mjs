@@ -17,12 +17,16 @@ const nextConfig = {
       tls: false,
       encoding: false,
     }
-    // Ignore optional wallet dependencies
+    
+    // Ignore optional wallet dependencies that may not be installed
     config.plugins.push(
       new webpack.IgnorePlugin({
-        resourceRegExp: /^(@gemini-wallet\/core|porto)$/,
+        checkResource(resource) {
+          return /^(porto|@gemini-wallet\/core)/.test(resource)
+        },
       })
     )
+    
     return config
   },
 }
