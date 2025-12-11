@@ -14,6 +14,16 @@ const nextConfig = {
       minimize: false,
     }
     
+    // Add polyfill for indexedDB on server side
+    if (isServer) {
+      config.plugins.push(
+        new webpack.DefinePlugin({
+          'global.indexedDB': JSON.stringify(undefined),
+          'indexedDB': JSON.stringify(undefined),
+        })
+      )
+    }
+    
     config.resolve.fallback = { 
       ...config.resolve.fallback,
       fs: false, 
