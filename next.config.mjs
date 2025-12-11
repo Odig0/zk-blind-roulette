@@ -18,19 +18,10 @@ const nextConfig = {
       encoding: false,
     }
     
-    // Ignore optional wallet dependencies that may not be installed
+    // Only ignore connectors that are definitely not installed
     config.plugins.push(
       new webpack.IgnorePlugin({
-        checkResource(resource) {
-          // Ignore optional wallet connectors not being used
-          const optionalDeps = [
-            'porto',
-            '@gemini-wallet/core',
-            '@react-native-async-storage/async-storage',
-            'react-native',
-          ]
-          return optionalDeps.some(dep => resource.includes(dep))
-        },
+        resourceRegExp: /^(porto|@gemini-wallet\/core)$/,
       })
     )
     
