@@ -20,6 +20,7 @@ const nextConfig = {
       path: false,
       os: false,
       '@react-native-async-storage/async-storage': false,
+      'porto/internal': false,
     }
     
     // External modules that should not be bundled
@@ -29,6 +30,7 @@ const nextConfig = {
       'encoding',
       '@gemini-wallet/core',
       'porto',
+      'porto/internal',
       '@react-native-async-storage/async-storage'
     )
     
