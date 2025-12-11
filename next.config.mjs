@@ -18,10 +18,10 @@ const nextConfig = {
       encoding: false,
     }
     
-    // Only ignore connectors that are definitely not installed
+    // Ignore optional dependencies not needed for web
     config.plugins.push(
       new webpack.IgnorePlugin({
-        resourceRegExp: /^(porto|@gemini-wallet\/core)$/,
+        resourceRegExp: /^(porto|@gemini-wallet\/core|@react-native-async-storage\/async-storage)$/,
       })
     )
     
