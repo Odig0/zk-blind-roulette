@@ -1,6 +1,6 @@
 import { http, createConfig } from "wagmi"
-import { sepolia, mainnet, polygon, arbitrum, optimism, base } from "wagmi/chains"
-import { injected } from "wagmi/connectors"
+import { sepolia, mainnet, polygon, arbitrum, optimism, base, scrollSepolia } from "wagmi/chains"
+import { injected, walletConnect, metaMask, coinbaseWallet } from "wagmi/connectors"
 import { erc20Abi } from "viem"
 
 // Network configuration
@@ -21,9 +21,24 @@ export type TokenSymbol = keyof typeof TOKEN_ADDRESSES
 
 // Wagmi configuration with multiple chains
 export const config = createConfig({
-  chains: [sepolia, mainnet, polygon, arbitrum, optimism, base],
-  connectors: [injected()],
+  chains: [scrollSepolia, sepolia, mainnet, polygon, arbitrum, optimism, base],
+  connectors: [
+    injected(),
+    walletConnect({ 
+      projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "default_project_id",
+      showQrModal: true,
+      metadata: {
+        name: "Raffero",
+        description: "Anonymous Raffle System",
+        url: "https://raffero.vercel.app",
+        icons: ["https://raffero.vercel.app/logoEnaid.png"]
+      }
+    }),
+    metaMask(),
+    coinbaseWallet({ appName: "Raffero" }),
+  ],
   transports: {
+    [scrollSepolia.id]: http(),
     [sepolia.id]: http(),
     [mainnet.id]: http(),
     [polygon.id]: http(),
