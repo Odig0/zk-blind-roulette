@@ -3,8 +3,18 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Optimización de imágenes para mejor performance en móviles
   images: {
-    unoptimized: true,
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200],
+    imageSizes: [16, 32, 48, 64, 96],
+    minimumCacheTTL: 60,
+  },
+  // Compresión para reducir tamaño de transferencia
+  compress: true,
+  // Optimizaciones experimentales
+  experimental: {
+    optimizePackageImports: ['@rainbow-me/rainbowkit', 'wagmi', 'lucide-react'],
   },
   webpack: (config, { isServer, webpack }) => {
     if (isServer) {

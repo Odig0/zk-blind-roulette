@@ -74,14 +74,14 @@ export function WalletCard() {
       <CardContent className="space-y-5">
         {isMobile ? (
           <div className="text-center space-y-4 py-6">
-            <Monitor className="h-12 w-12 mx-auto text-muted-foreground" />
+            <Wallet className="h-12 w-12 mx-auto text-neon-purple" />
             <div className="space-y-2">
-              <p className="text-base font-medium text-foreground">Desktop Required</p>
+              <p className="text-base font-medium text-foreground">Wallet Required</p>
               <p className="text-sm text-muted-foreground">
-                This application requires a desktop browser with a Web3 wallet extension (like MetaMask) to connect and interact with the blockchain.
+                To use Raffero, you need a Web3 wallet like Gem Wallet or MetaMask installed on your device.
               </p>
               <p className="text-xs text-muted-foreground mt-2">
-                Please visit this site on a desktop computer to use all features.
+                Download a compatible wallet from your app store to get started.
               </p>
             </div>
           </div>

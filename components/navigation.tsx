@@ -28,16 +28,16 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="relative w-10 h-10 rounded-full overflow-hidden shadow-lg">
+          <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden shadow-lg">
             <Image
-              src="/logoEnaid.png"
-              alt="Enaid Logo"
+              src="/logoRaffero.png"
+              alt="Raffero Logo"
               width={40}
               height={40}
               className="object-cover"
             />
           </div>
-          <span className="text-foreground font-semibold text-lg tracking-wide">RAFFERO</span>
+          <span className="text-foreground font-semibold text-base sm:text-lg tracking-wide">RAFFERO</span>
         </Link>
 
         {/* Desktop Navigation */}

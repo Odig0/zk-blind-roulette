@@ -19,12 +19,14 @@ export function Starfield() {
     resizeCanvas()
     window.addEventListener("resize", resizeCanvas)
 
-    // Create stars
+    // Create stars - reduce count on mobile for better performance
+    const isMobile = window.innerWidth < 768
+    const starCount = isMobile ? 200 : 500
     const stars: { x: number; y: number; size: number; speed: number; opacity: number }[] = []
-    for (let i = 0; i < 500; i++) {
+    for (let i = 0; i < starCount; i++) {
       stars.push({
-        x: Math.random()   * canvas.width,
-        y: Math.random()   * canvas.height,
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
         size: Math.random() * 2.5 + 0.3,
         speed: Math.random() * 0.5 + 0.1,
         opacity: Math.random() * 0.9 + 0.2,

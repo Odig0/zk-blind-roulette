@@ -44,16 +44,15 @@ export function RouletteWheel({
         BALANCE: ${userBalance}
       </h2>
 
-      <div className="relative w-full max-w-[280px] sm:max-w-sm md:max-w-md">
+      <div className="relative w-full max-w-[300px] sm:max-w-[380px] md:max-w-[400px] mx-auto">
         <div
           ref={wheelRef}
-          className="w-full aspect-square"
+          className="w-full aspect-square relative"
           style={{
             transform: `rotate(${rotation}deg)`,
             transition: isAnimating ? "transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)" : "none",
           }}
           onTransitionEnd={onTransitionEnd}
-          className="w-[400px] h-[400px] relative"
         >
           <Image
             src="/wheel.png"
@@ -67,7 +66,7 @@ export function RouletteWheel({
 
         {/* Pointer/Arrow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 z-10">
-          <div className="w-0 h-0 border-l-[15px] border-l-transparent border-r-[15px] border-r-transparent border-t-[30px] border-t-neon-pink drop-shadow-[0_0_10px_rgba(255,107,157,0.8)]" />
+          <div className="w-0 h-0 border-l-[12px] sm:border-l-[15px] border-l-transparent border-r-[12px] sm:border-r-[15px] border-r-transparent border-t-[24px] sm:border-t-[30px] border-t-neon-pink drop-shadow-[0_0_10px_rgba(255,107,157,0.8)]" />
         </div>
       </div>
 
