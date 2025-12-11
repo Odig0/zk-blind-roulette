@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useRef } from "react"
 import { Starfield } from "@/components/starfield"
 import { Navigation } from "@/components/navigation"
 import { HeroSection } from "@/components/hero-section"

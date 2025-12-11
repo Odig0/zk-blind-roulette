@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "cross-env NEXT_PRIVATE_WEBPACK_MODE=1 next build",
-    "dev": "cross-env NEXT_PRIVATE_WEBPACK_MODE=1 next dev",
+    "build": "next build --turbopack",
+    "dev": "next dev --turbopack",
     "lint": "eslint .",
     "start": "next start",
     "test": "vitest run",

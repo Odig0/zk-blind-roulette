@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Wallet, CheckCircle2, XCircle, LogOut, Monitor } from "lucide-react"
 import { useWeb3Store } from "@/store/web3-store"
-import { SEPOLIA_CHAIN_ID } from "@/blockchain/config"
 import { sepolia } from "wagmi/chains"
 
 export function WalletCard() {
@@ -37,11 +36,10 @@ export function WalletCard() {
   useEffect(() => {
     if (isConnected && address) {
       const currentChainId = chain?.id ?? chainId
-      const isCorrect = currentChainId === SEPOLIA_CHAIN_ID
       
       setWalletAddress(address)
       setChainId(currentChainId)
-      setIsCorrectNetwork(isCorrect)
+      setIsCorrectNetwork(true) // Always true since we removed network validation
       setEnsName(ensName ?? null)
     } else {
       // Clear state when disconnected
@@ -56,9 +54,8 @@ export function WalletCard() {
   useEffect(() => {
     if (isConnected) {
       const currentChainId = chain?.id ?? chainId
-      const isCorrect = currentChainId === SEPOLIA_CHAIN_ID
       setChainId(currentChainId)
-      setIsCorrectNetwork(isCorrect)
+      setIsCorrectNetwork(true) // Always true since we removed network validation
     }
   }, [chainId, chain?.id, isConnected, setChainId, setIsCorrectNetwork])
 
@@ -106,7 +103,7 @@ export function WalletCard() {
             <div className="w-full flex items-center justify-between py-3 px-4 bg-secondary/50 rounded-lg">
               <span className="text-base text-muted-foreground">Network</span>
               <span className="text-base font-medium">
-                {chain?.name || (chainId === SEPOLIA_CHAIN_ID ? "Sepolia" : `Chain ${chainId}`)}
+                {chain?.name || `Chain ${chainId}`}
               </span>
             </div>
 

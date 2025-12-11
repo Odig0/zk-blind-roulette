@@ -30,11 +30,6 @@ vi.mock("wagmi/chains", () => ({
   base: { id: 8453, name: "Base" },
 }))
 
-// Mock blockchain config
-vi.mock("@/blockchain/config", () => ({
-  SEPOLIA_CHAIN_ID: 11155111,
-}))
-
 // Mock Zustand store
 vi.mock("@/store/web3-store", () => ({
   useWeb3Store: vi.fn(() => ({

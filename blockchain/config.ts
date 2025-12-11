@@ -1,42 +1,44 @@
 import { http, createConfig } from "wagmi"
 import { sepolia, mainnet, polygon, arbitrum, optimism, base, scrollSepolia } from "wagmi/chains"
-import { injected, walletConnect, metaMask, coinbaseWallet } from "wagmi/connectors"
-import { erc20Abi } from "viem"
+import { injected, metaMask, coinbaseWallet } from "wagmi/connectors"
+import type { CreateConnectorFn } from "wagmi"
 
-// Network configuration
-export const SEPOLIA_CHAIN_ID = 11155111
+// Lazy load WalletConnect only on client side
+let walletConnectConnector: CreateConnectorFn | null = null
 
-// Token configuration
-export const TOKEN_ADDRESSES = {
-  DAI: (process.env.NEXT_PUBLIC_DAI_ADDRESS ) as `0x${string}`,
-  USDC: (process.env.NEXT_PUBLIC_USDC_ADDRESS) as `0x${string}`,
-} as const
+if (typeof window !== 'undefined') {
+  const { walletConnect } = require('wagmi/connectors')
+  walletConnectConnector = walletConnect({ 
+    projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
+    showQrModal: true,
+    metadata: {
+      name: "Raffero",
+      description: "Anonymous Raffle System",
+      url: "https://raffero.vercel.app",
+      icons: ["https://raffero.vercel.app/logoEnaid.png"]
+    },
+    qrModalOptions: {
+      themeMode: 'dark' as const,
+    },
+  })
+}
 
-export const TOKEN_DECIMALS = {
-  DAI: 18,
-  USDC: 6,
-} as const
+// Build connectors array based on environment
+const connectors: CreateConnectorFn[] = [
+  injected(),
+  metaMask(),
+  coinbaseWallet({ appName: "Raffero" }),
+]
 
-export type TokenSymbol = keyof typeof TOKEN_ADDRESSES
+// Add WalletConnect only on client
+if (walletConnectConnector) {
+  connectors.splice(1, 0, walletConnectConnector)
+}
 
 // Wagmi configuration with multiple chains
 export const config = createConfig({
   chains: [scrollSepolia, sepolia, mainnet, polygon, arbitrum, optimism, base],
-  connectors: [
-    injected(),
-    walletConnect({ 
-      projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
-      showQrModal: true,
-      metadata: {
-        name: "Raffero",
-        description: "Anonymous Raffle System",
-        url: "https://raffero.vercel.app",
-        icons: ["https://raffero.vercel.app/logoEnaid.png"]
-      }
-    }),
-    metaMask(),
-    coinbaseWallet({ appName: "Raffero" }),
-  ],
+  connectors,
   transports: {
     [scrollSepolia.id]: http(),
     [sepolia.id]: http(),
@@ -48,18 +50,3 @@ export const config = createConfig({
   },
   ssr: true,
 })
-
-// Use viem's built-in ERC20 ABI with mint function extension
-export const ERC20_ABI = [
-  ...erc20Abi,
-  {
-    name: "mint",
-    type: "function",
-    stateMutability: "nonpayable",
-    inputs: [
-      { name: "to", type: "address" },
-      { name: "amount", type: "uint256" },
-    ],
-    outputs: [],
-  },
-] as const

@@ -6,61 +6,23 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  swcMinify: true,
   webpack: (config, { isServer, webpack }) => {
-    // Disable webpack minification to avoid the WebpackError bug
-    config.optimization = {
-      ...config.optimization,
-      minimize: false,
-    }
-    
-    // Add polyfill for indexedDB on server side
     if (isServer) {
-      config.plugins.push(
-        new webpack.DefinePlugin({
-          'global.indexedDB': JSON.stringify(undefined),
-          'indexedDB': JSON.stringify(undefined),
-        })
-      )
+      config.externals.push('pino-pretty', 'lokijs', 'encoding')
     }
-    
-    config.resolve.fallback = { 
+    config.resolve.fallback = {
       ...config.resolve.fallback,
-      fs: false, 
-      net: false, 
+      fs: false,
+      net: false,
       tls: false,
-      crypto: false,
-      stream: false,
-      http: false,
-      https: false,
-      zlib: false,
-      path: false,
-      os: false,
-      '@react-native-async-storage/async-storage': false,
-      'porto/internal': false,
+      encoding: false,
     }
-    
-    // External modules that should not be bundled
-    config.externals.push(
-      'pino-pretty', 
-      'lokijs', 
-      'encoding',
-      '@gemini-wallet/core',
-      'porto',
-      'porto/internal',
-      '@react-native-async-storage/async-storage'
+    // Ignore optional wallet dependencies
+    config.plugins.push(
+      new webpack.IgnorePlugin({
+        resourceRegExp: /^(@gemini-wallet\/core|porto)$/,
+      })
     )
-    
-    // Ignore pino and related packages on client side
-    if (!isServer) {
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        'pino': false,
-        'pino-pretty': false,
-        'thread-stream': false,
-      }
-    }
-    
     return config
   },
 }
