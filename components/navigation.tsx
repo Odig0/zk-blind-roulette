@@ -10,8 +10,8 @@ import { useAccount, useChainId, useChains } from "wagmi"
 
 const navLinks = [
   { href: "/how-it-works", label: "How It Works" },
-  { href: "/raffles", label: "Raffles" },
-  { href: "#dashboard", label: "Dashboard" },
+  { href: "/raffles/create", label: "Create Raffle" },
+  { href: "/raffles/enter", label: "Enter Raffle" },
 ]
 
 export function Navigation() {

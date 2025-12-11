@@ -1,30 +1,32 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
-import { Calendar, Users, Clock, Shield } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Calendar, Users, Clock, Shield, ArrowLeft } from "lucide-react"
+import Link from "next/link"
 
 export function HowItWorksSection() {
   const features = [
     {
       icon: Calendar,
-      title: "Schedule Your Draw",
-      description: "Create custom raffles by setting your preferred date and time. Full control over when your raffle happens.",
+      title: "Create Your Raffle",
+      description: "Set up custom raffles by choosing your ticket price, prize pool, max participants, and draw time. Full control over when your raffle happens.",
       color: "text-cyan-400",
       bgColor: "bg-cyan-500/10",
       borderColor: "border-cyan-500/30",
     },
     {
       icon: Users,
-      title: "Set Participants Limit",
-      description: "Define the maximum number of participants for your raffle. Perfect for exclusive or community events.",
+      title: "Join with Invite Code",
+      description: "Enter raffles using exclusive invitation codes. Some raffles may be public and available to everyone without a code.",
       color: "text-purple-400",
       bgColor: "bg-purple-500/10",
       borderColor: "border-purple-500/30",
     },
     {
       icon: Clock,
-      title: "Daily Scheduled Draws",
-      description: "Join scheduled raffles happening twice daily. Consistent opportunities to participate and win prizes.",
+      title: "Wait for Draw Time",
+      description: "Once you've entered, wait until the scheduled draw time. The winner will be selected automatically using verifiable randomness.",
       color: "text-orange-400",
       bgColor: "bg-orange-500/10",
       borderColor: "border-orange-500/30",
@@ -32,7 +34,7 @@ export function HowItWorksSection() {
     {
       icon: Shield,
       title: "Private Verification",
-      description: "Winners verify results privately using zero-knowledge proofs. No public announcements, complete anonymity.",
+      description: "Winners verify results privately using zero-knowledge proofs. No public announcements, complete anonymity guaranteed.",
       color: "text-emerald-400",
       bgColor: "bg-emerald-500/10",
       borderColor: "border-emerald-500/30",
@@ -55,13 +57,23 @@ export function HowItWorksSection() {
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10 w-full">
+        {/* Back Button */}
+        <div className="mb-6">
+          <Link href="/">
+            <Button variant="ghost" className="gap-2 hover:gap-3 transition-all">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Home
+            </Button>
+          </Link>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-10 sm:mb-12 md:mb-16 space-y-3 sm:space-y-4">
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold">
             <span className="neon-gradient-text">How It Works</span>
           </h2>
           <p className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-3xl mx-auto px-4">
-            Create custom raffles or join scheduled draws. Experience truly anonymous and fair prize distribution powered by blockchain technology.
+            Create custom raffles or join with invitation codes. Experience truly anonymous and fair prize distribution powered by blockchain technology.
           </p>
         </div>
 
@@ -100,7 +112,7 @@ export function HowItWorksSection() {
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/20">
             <Clock className="h-5 w-5 text-cyan-400" />
             <span className="text-sm font-medium">
-              Scheduled draws run at <span className="text-cyan-400">12:00 PM</span> and <span className="text-purple-400">8:00 PM</span> daily
+              Each raffle has a <span className="text-cyan-400">specific draw time</span> set by the creator. Make sure to enter before the deadline!
             </span>
           </div>
         </div>

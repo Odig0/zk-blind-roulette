@@ -1,4 +1,6 @@
 export { RaffleCard } from "./raffle-card"
 export { RaffleFilters } from "./raffle-filters"
 export { RaffleDetail } from "./raffle-detail"
+export { BuyTicketModal } from "./buy-ticket-modal"
+export { CheckWinnerCard } from "./check-winner-card"
 export type { RaffleStatus, RaffleType } from "./raffle-card"
