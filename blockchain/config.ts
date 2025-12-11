@@ -25,7 +25,7 @@ export const config = createConfig({
   connectors: [
     injected(),
     walletConnect({ 
-      projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "default_project_id",
+      projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
       showQrModal: true,
       metadata: {
         name: "Raffero",
