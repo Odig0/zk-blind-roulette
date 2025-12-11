@@ -6,7 +6,14 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  swcMinify: true,
   webpack: (config, { isServer, webpack }) => {
+    // Disable webpack minification to avoid the WebpackError bug
+    config.optimization = {
+      ...config.optimization,
+      minimize: false,
+    }
+    
     config.resolve.fallback = { 
       ...config.resolve.fallback,
       fs: false, 
