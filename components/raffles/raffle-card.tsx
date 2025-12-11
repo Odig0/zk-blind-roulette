@@ -66,7 +66,7 @@ export function RaffleCard({
 
   return (
     <Card className="glass-card p-3 sm:p-4 hover:border-cyan-500/50 transition-all duration-300 group">
-      <div className="space-y-2 sm:space-y-3">
+      <div className="space-y-3 sm:space-y-3">
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-semibold text-base sm:text-lg line-clamp-2 group-hover:text-cyan-400 transition-colors">
@@ -89,13 +89,13 @@ export function RaffleCard({
         </div>
 
         {/* Prize */}
-        <div className="space-y-1">
+        <div className="space-y-1 pb-2">
           <p className="text-xs text-muted-foreground">Prize</p>
           <p className="text-sm font-medium text-foreground">{prize}</p>
         </div>
 
         {/* Stats */}
-        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+        <div className="flex items-center gap-4 text-xs text-muted-foreground pb-1">
           <div className="flex items-center gap-1">
             <Clock className="h-3 w-3" />
             <span>{endsIn}</span>
@@ -109,7 +109,7 @@ export function RaffleCard({
         </div>
 
         {/* Action Button */}
-        <div className="pt-2">
+        <div className="pt-4 sm:pt-3">
           {getActionButton()}
         </div>
       </div>

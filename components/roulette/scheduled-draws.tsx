@@ -167,7 +167,7 @@ export function ScheduledDraws({ onBet, userBalance, enteredDrawIds = [] }: Sche
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-xs text-gray-400 mt-3 pt-3 border-t border-gray-700">
+              <div className="grid grid-cols-2 gap-2 text-xs text-gray-400 mt-3 pt-3 border-t border-gray-700 mb-4">
                 <div>
                   <p className="text-gray-500">Bettors</p>
                   <p className="font-semibold text-white">{draw.totalBettors}</p>
@@ -180,7 +180,7 @@ export function ScheduledDraws({ onBet, userBalance, enteredDrawIds = [] }: Sche
 
               {/* Enter Raffle Button or Confirmation Message */}
               {enteredDrawIds.includes(draw.id) ? (
-                <div className="mt-3 p-3 rounded-lg bg-gradient-to-r from-cyan-900/30 to-purple-900/30 border border-cyan-500/30">
+                <div className="p-3 rounded-lg bg-gradient-to-r from-cyan-900/30 to-purple-900/30 border border-cyan-500/30">
                   <p className="text-sm text-cyan-300 text-center font-medium">
                     ✓ Entered • Draw executes at {draw.time} GMT-4
                   </p>
