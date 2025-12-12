@@ -18,7 +18,7 @@ interface BuyTicketModalProps {
 }
 
 export function BuyTicketModal({ raffleId, ticketPrice, isOpen, onClose, onSuccess }: BuyTicketModalProps) {
-  const [step, setStep] = useState<"generate" | "computing" | "purchasing">("generate")
+  const [step, setStep] = useState<"generate" | "computing" | "purchasing" | "success">("generate")
   const [secret, setSecret] = useState<bigint>()
   const [nullifier, setNullifier] = useState<bigint>()
   const [commitment, setCommitment] = useState<bigint>()
@@ -54,18 +54,22 @@ export function BuyTicketModal({ raffleId, ticketPrice, isOpen, onClose, onSucce
         description: "Your ticket has been saved securely. Good luck!",
       })
 
-      // Cerrar modal y resetear
-      setTimeout(() => {
-        onClose()
-        setStep("generate")
-        setSecret(undefined)
-        setNullifier(undefined)
-        setCommitment(undefined)
-      }, 2000)
-
+      // Cambiar a estado de éxito
+      setStep("success")
       onSuccess?.()
     }
-  }, [isSuccess, commitment, secret, nullifier, raffleId, toast, onSuccess, onClose])
+  }, [isSuccess, commitment, secret, nullifier, raffleId, toast, onSuccess])
+
+  const handleClose = () => {
+    onClose()
+    // Resetear estado después de cerrar
+    setTimeout(() => {
+      setStep("generate")
+      setSecret(undefined)
+      setNullifier(undefined)
+      setCommitment(undefined)
+    }, 300)
+  }
 
   const handleGenerateAndBuy = () => {
     // Generar secret y nullifier
@@ -91,79 +95,106 @@ export function BuyTicketModal({ raffleId, ticketPrice, isOpen, onClose, onSucce
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <Card className="glass-card p-6 space-y-4 max-w-md w-full relative">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <X className="h-5 w-5" />
-        </button>
-
-        <h3 className="text-xl font-bold neon-gradient-text">Buy Private Ticket</h3>
-
-      <div className="space-y-3">
-        <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">Ticket Price</span>
-          <span className="font-medium">{formatEther(ticketPrice)} ETH</span>
-        </div>
-
-        <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
-          <p className="text-xs text-purple-300">
-            🔒 <strong>Privacy Guaranteed:</strong> Your ticket is completely anonymous. We generate a
-            cryptographic commitment that proves you own a ticket without revealing your identity.
-          </p>
-        </div>
-
-        {step === "generate" && (
-          <Button
-            onClick={handleGenerateAndBuy}
-            size="lg"
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm">
+      <Card className="glass-card w-full sm:max-w-md sm:m-4 rounded-t-3xl sm:rounded-2xl relative animate-slide-up">
+        <div className="p-5 sm:p-6 space-y-4">
+          {/* Close Button */}
+          <button
+            onClick={handleClose}
+            className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors z-10"
+            aria-label="Close"
           >
-            Generate Private Ticket
-          </Button>
-        )}
+            <X className="h-6 w-6" />
+          </button>
 
-        {step === "computing" && (
-          <div className="flex flex-col items-center gap-3 py-4">
-            <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
-            <p className="text-sm text-muted-foreground">Computing commitment on-chain...</p>
-          </div>
-        )}
+          <h3 className="text-2xl sm:text-xl font-bold neon-gradient-text pr-8">Buy Private Ticket</h3>
 
-        {step === "purchasing" && commitment && (
-          <>
-            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-              <p className="text-xs text-emerald-300">
-                ✓ Commitment generated successfully!
+          <div className="space-y-4">
+            <div className="flex justify-between items-center p-4 rounded-xl bg-background/50 border border-border">
+              <span className="text-sm text-muted-foreground">Ticket Price</span>
+              <span className="text-xl font-bold neon-gradient-text">{formatEther(ticketPrice)} ETH</span>
+            </div>
+
+            <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/30">
+              <p className="text-sm text-purple-200 leading-relaxed">
+                🔒 <strong className="text-purple-100">Privacy Guaranteed:</strong> Your ticket is completely anonymous. We generate a
+                cryptographic commitment that proves you own a ticket without revealing your identity.
               </p>
             </div>
 
-            <Button
-              onClick={handlePurchase}
-              disabled={isPending}
-              size="lg"
-              className="w-full bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600"
-            >
-              {isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Purchasing...
-                </>
-              ) : (
-                `Purchase Ticket - ${formatEther(ticketPrice)} ETH`
-              )}
-            </Button>
-          </>
-        )}
+            {step === "generate" && (
+              <Button
+                onClick={handleGenerateAndBuy}
+                size="lg"
+                className="w-full h-14 text-base font-semibold bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-lg shadow-purple-500/50"
+              >
+                Generate Private Ticket
+              </Button>
+            )}
 
-        <p className="text-xs text-center text-muted-foreground">
-          Your secret and nullifier will be stored locally and securely
-        </p>
-      </div>
-    </Card>
+            {step === "computing" && (
+              <div className="flex flex-col items-center gap-4 py-8">
+                <Loader2 className="h-10 w-10 animate-spin text-purple-400" />
+                <p className="text-base text-center text-muted-foreground">Computing commitment on-chain...</p>
+              </div>
+            )}
+
+            {step === "purchasing" && commitment && (
+              <>
+                <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
+                  <p className="text-sm text-emerald-200">
+                    ✓ Commitment generated successfully!
+                  </p>
+                </div>
+
+                <Button
+                  onClick={handlePurchase}
+                  disabled={isPending}
+                  size="lg"
+                  className="w-full h-14 text-base font-semibold bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 shadow-lg shadow-cyan-500/50"
+                >
+                  {isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Purchasing...
+                    </>
+                  ) : (
+                    `Purchase Ticket - ${formatEther(ticketPrice)} ETH`
+                  )}
+                </Button>
+              </>
+            )}
+
+            {step === "success" && (
+              <>
+                <div className="p-6 rounded-xl bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30">
+                  <div className="text-center space-y-2">
+                    <div className="text-5xl">🎉</div>
+                    <p className="text-lg font-bold text-emerald-100">Ticket Purchased!</p>
+                    <p className="text-sm text-emerald-200">
+                      Your private ticket has been saved securely
+                    </p>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={handleClose}
+                  size="lg"
+                  className="w-full h-14 text-base font-semibold bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 shadow-lg shadow-emerald-500/50"
+                >
+                  Done
+                </Button>
+              </>
+            )}
+
+            {step !== "success" && (
+              <p className="text-xs text-center text-muted-foreground pt-2">
+                Your secret and nullifier will be stored locally and securely
+              </p>
+            )}
+          </div>
+        </div>
+      </Card>
     </div>
   )
 }
