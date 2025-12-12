@@ -30,7 +30,7 @@ export function Navigation() {
         <Link href="/" className="flex items-center gap-2 group">
           <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden shadow-lg">
             <Image
-              src="/.png"
+              src="/logoRaffero.png"
               alt="Raffero Logo"
               width={40}
               height={40}
