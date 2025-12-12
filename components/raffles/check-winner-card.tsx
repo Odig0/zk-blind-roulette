@@ -81,64 +81,16 @@ export function CheckWinnerCard({ raffleId }: CheckWinnerCardProps) {
     }, 1500)
   }
 
-  // Si la rifa está activa y se puede sortear
-  if (raffleData?.status === RaffleStatus.Active && canDraw) {
-    return (
-      <Card className="glass-card p-6 space-y-4">
-        <h3 className="text-xl font-bold text-amber-400">Ready to Draw!</h3>
-        <p className="text-sm text-muted-foreground">
-          The raffle has ended. Anyone can trigger the winner selection.
-        </p>
-        <Button
-          onClick={handleDrawWinner}
-          disabled={isDrawing}
-          size="lg"
-          className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
-        >
-          {isDrawing ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Drawing...
-            </>
-          ) : (
-            "🎲 Draw Winner Now"
-          )}
-        </Button>
-      </Card>
-    )
-  }
+  // Determinar el estado de la rifa
+  const isRaffleClosed = raffleData?.status === RaffleStatus.Closed
+  const canDrawWinner = Boolean(raffleData?.status === RaffleStatus.Active && canDraw)
+  const isRaffleActive = Boolean(raffleData?.status === RaffleStatus.Active && !canDraw)
 
-  // Si la rifa está cerrada (ya se sorteó)
-  if (raffleData?.status === RaffleStatus.Closed && hasTicket) {
+  // Renderizar resultado si ya verificó
+  if (isWinner !== null && isRaffleClosed) {
     return (
-      <Card className="glass-card p-6 space-y-4">
-        <h3 className="text-xl font-bold neon-gradient-text">Check Your Result</h3>
-
-        {isWinner === null ? (
-          <>
-            <p className="text-sm text-muted-foreground">
-              The winner has been selected! Check privately if you won.
-            </p>
-            <Button
-              onClick={handleCheckResult}
-              disabled={checking}
-              size="lg"
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-            >
-              {checking ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Checking...
-                </>
-              ) : (
-                "🔍 Check Result Privately"
-              )}
-            </Button>
-            <p className="text-xs text-center text-purple-300">
-              Only you will see if you won
-            </p>
-          </>
-        ) : isWinner ? (
+      <Card className="glass-card p-6 space-y-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/30">
+        {isWinner ? (
           <div className="space-y-3">
             <div className="p-6 rounded-lg bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border-2 border-emerald-500/50 text-center">
               <Trophy className="h-12 w-12 mx-auto mb-3 text-emerald-400" />
@@ -178,22 +130,91 @@ export function CheckWinnerCard({ raffleId }: CheckWinnerCardProps) {
     )
   }
 
-  // Si no hay ticket pero está cerrada, mostrar mensaje
-  if (raffleData?.status === RaffleStatus.Closed && !hasTicket) {
-    return (
-      <Card className="glass-card p-6 space-y-4">
-        <h3 className="text-xl font-bold text-muted-foreground">Winner Selected</h3>
+  // Siempre mostrar el componente con el botón
+  return (
+    <Card className="glass-card p-6 space-y-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/30">
+      <div className="flex items-center gap-3">
+        <Trophy className="h-6 w-6 text-purple-400" />
+        <h3 className="text-xl font-bold neon-gradient-text">
+          {canDrawWinner ? "🎲 Draw Winner" : isRaffleClosed ? "🏆 Check Result" : "⏳ Check Winner"}
+        </h3>
+      </div>
+
+      {/* Mensajes de estado */}
+      {isRaffleActive && (
+        <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
+          <p className="text-sm text-blue-300 text-center">
+            {hasTicket 
+              ? "⏳ You have a ticket! Wait for the raffle to end."
+              : "⏳ Raffle is active. Buy a ticket to participate!"
+            }
+          </p>
+        </div>
+      )}
+
+      {canDrawWinner && (
+        <p className="text-sm text-amber-300">
+          ⚡ The raffle has ended! Click below to draw the winner.
+        </p>
+      )}
+
+      {isRaffleClosed && hasTicket && (
+        <p className="text-sm text-purple-300">
+          🎯 The winner has been selected! Check if you won privately.
+        </p>
+      )}
+
+      {isRaffleClosed && !hasTicket && (
         <p className="text-sm text-muted-foreground">
           The winner has been selected, but you don't have a ticket for this raffle.
         </p>
-        <div className="p-3 rounded-lg bg-muted/30 border border-border">
-          <p className="text-xs text-muted-foreground">
-            Winner Index: {raffleData.winnerIndex.toString()}
-          </p>
-        </div>
-      </Card>
-    )
-  }
+      )}
 
-  return null
+      {/* Botón de Draw Winner */}
+      {canDrawWinner && (
+        <Button
+          onClick={handleDrawWinner}
+          disabled={isDrawing}
+          size="lg"
+          className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-lg h-14"
+        >
+          {isDrawing ? (
+            <>
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              Drawing Winner...
+            </>
+          ) : (
+            "🎲 Draw Winner Now"
+          )}
+        </Button>
+      )}
+
+      {/* Botón de Check Result - SIEMPRE VISIBLE */}
+      <Button
+        onClick={handleCheckResult}
+        disabled={!isRaffleClosed || checking || !hasTicket}
+        size="lg"
+        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-lg h-14 disabled:opacity-50"
+      >
+        {checking ? (
+          <>
+            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            Checking Result...
+          </>
+        ) : (
+          "🔍 Check If I Won"
+        )}
+      </Button>
+
+      {/* Mensaje de ayuda */}
+      <p className="text-xs text-center text-muted-foreground">
+        {!hasTicket 
+          ? "❌ You need a ticket to check results"
+          : !isRaffleClosed 
+            ? "⏳ Button will activate when raffle ends"
+            : "🔒 Your result is completely private - only you can see it"
+        }
+      </p>
+    </Card>
+  )
 }

@@ -23,7 +23,7 @@ export default function LiveRafflePage() {
   const { toast } = useToast()
   
   // Por ahora usaremos el ID "0" si es "latest", o buscaremos el ID real del código
-  const [currentRaffleId, setCurrentRaffleId] = useState<bigint>(BigInt(0))
+  const [currentRaffleId, setCurrentRaffleId] = useState<bigint>(BigInt(1))  // Cambiado a 1 (la última raffle creada)
   const [raffleData, setRaffleData] = useState<any>(null)
   
   const { drawWinner, isPending } = usePrivateRaffle()
@@ -35,6 +35,7 @@ export default function LiveRafflePage() {
   const [showBuyTicket, setShowBuyTicket] = useState(false)
   const [isSpinning, setIsSpinning] = useState(false)
   const [rotation, setRotation] = useState(0)
+  const [hasSpunWinner, setHasSpunWinner] = useState(false)
   const wheelRef = useRef<HTMLDivElement>(null)
 
   // Fetch raffle data from Firebase
@@ -44,11 +45,18 @@ export default function LiveRafflePage() {
         const response = await fetch(`https://us-central1-raffero-58001.cloudfunctions.net/api/raffles/verify/${raffleCode}`)
         const data = await response.json()
         
+        console.log("📦 Firebase raffle data:", data)
+        
         if (data.success && data.raffle) {
           setRaffleData(data.raffle)
-          // Aquí podrías mapear el raffleCode a un raffleId real del contrato
-          // Por ahora usamos 0
-          setCurrentRaffleId(BigInt(0))
+          
+          // Usar el raffleId de Firebase si existe, sino usar 1 (última raffle)
+          const raffleId = data.raffle.raffleId !== undefined 
+            ? BigInt(data.raffle.raffleId) 
+            : BigInt(1)  // Cambiado a 1
+          
+          console.log("🎯 Using raffleId:", raffleId.toString())
+          setCurrentRaffleId(raffleId)
         }
       } catch (error) {
         console.error('Error fetching raffle:', error)
@@ -236,31 +244,36 @@ export default function LiveRafflePage() {
 
             {hasEnded && (
               <div className="mt-6 space-y-4">
-                <Button
-                  onClick={async () => {
-                    // Spin animation
-                    setIsSpinning(true)
-                    const spins = 5 + Math.random() * 3 // 5-8 full rotations
-                    const finalDegree = Math.random() * 360
-                    setRotation(360 * spins + finalDegree)
-                    
-                    // Draw winner after animation starts
-                    await drawWinner(currentRaffleId)
-                    
-                    // Stop spinning after 4 seconds
-                    setTimeout(() => {
-                      setIsSpinning(false)
-                    }, 4000)
-                  }}
-                  disabled={isPending || isSpinning || raffle.status !== 0}
-                  size="lg"
-                  className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
-                >
-                  {isPending || isSpinning ? "🎰 Spinning..." : "🎲 Draw Winner Now"}
-                </Button>
-                <p className="text-sm text-muted-foreground text-center">
-                  The raffle has ended. Click above to select the winner!
-                </p>
+                {raffle.status === 0 ? (
+                  <>
+                    <Button
+                      onClick={async () => {
+                        // Spin animation
+                        setIsSpinning(true)
+                        const spins = 5 + Math.random() * 3 // 5-8 full rotations
+                        const finalDegree = Math.random() * 360
+                        setRotation(360 * spins + finalDegree)
+                        
+                        // Draw winner after animation starts
+                        await drawWinner(currentRaffleId)
+                        
+                        // Stop spinning after 4 seconds and enable check button
+                        setTimeout(() => {
+                          setIsSpinning(false)
+                          setHasSpunWinner(true)
+                        }, 4000)
+                      }}
+                      disabled={isPending || isSpinning}
+                      size="lg"
+                      className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
+                    >
+                      {isPending || isSpinning ? "🎰 Spinning..." : "🎲 Draw Winner Now"}
+                    </Button>
+                    <p className="text-sm text-muted-foreground text-center">
+                      The raffle has ended. Click to draw the winner!
+                    </p>
+                  </>
+                ) : null}
               </div>
             )}
           </Card>

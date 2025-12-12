@@ -29,6 +29,25 @@ export function BuyTicketModal({ raffleId, ticketPrice, isOpen, onClose, onSucce
   // Generar commitment usando el contrato
   const { data: computedHash, isLoading: isComputing } = useComputeHash(secret, nullifier)
 
+  // Validar datos al abrir el modal
+  useEffect(() => {
+    if (isOpen) {
+      console.log("🎫 BuyTicketModal opened with:", {
+        raffleId: raffleId.toString(),
+        ticketPrice: ticketPrice.toString(),
+        ticketPriceETH: formatEther(ticketPrice),
+      })
+
+      if (!ticketPrice || ticketPrice === BigInt(0)) {
+        toast({
+          title: "⚠️ Warning",
+          description: "Ticket price is 0 ETH. This raffle may not be properly configured.",
+          variant: "destructive",
+        })
+      }
+    }
+  }, [isOpen, raffleId, ticketPrice, toast])
+
   useEffect(() => {
     if (computedHash && !commitment) {
       setCommitment(computedHash as bigint)
@@ -76,6 +95,11 @@ export function BuyTicketModal({ raffleId, ticketPrice, isOpen, onClose, onSucce
     const newSecret = generateSecret()
     const newNullifier = generateNullifier()
 
+    console.log("🔐 Generated credentials:", {
+      secret: newSecret.toString(),
+      nullifier: newNullifier.toString(),
+    })
+
     setSecret(newSecret)
     setNullifier(newNullifier)
     setStep("computing")
@@ -89,7 +113,33 @@ export function BuyTicketModal({ raffleId, ticketPrice, isOpen, onClose, onSucce
   const handlePurchase = async () => {
     if (!commitment) return
 
-    await purchaseTicket(raffleId, commitment, ticketPrice)
+    // Validar que el precio del ticket sea válido
+    if (!ticketPrice || ticketPrice === BigInt(0)) {
+      toast({
+        title: "❌ Invalid ticket price",
+        description: "The raffle ticket price is 0 or invalid. Please contact the raffle creator.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    console.log("💳 Attempting purchase:", {
+      raffleId: raffleId.toString(),
+      commitment: commitment.toString(),
+      ticketPrice: ticketPrice.toString(),
+      ticketPriceETH: formatEther(ticketPrice),
+    })
+
+    try {
+      await purchaseTicket(raffleId, commitment, ticketPrice)
+    } catch (error) {
+      console.error("❌ Purchase ticket error:", error)
+      toast({
+        title: "❌ Purchase failed",
+        description: error instanceof Error ? error.message : "Transaction failed. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   if (!isOpen) return null

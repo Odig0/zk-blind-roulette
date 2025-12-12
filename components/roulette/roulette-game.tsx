@@ -23,6 +23,8 @@ export function RouletteGame() {
   const [activeBets, setActiveBets] = useState<{ drawId: number; amount: number; drawTime: Date }[]>([])
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [hasScheduledDraw, setHasScheduledDraw] = useState(false)
+  const [canCheckResult, setCanCheckResult] = useState(false)
+  const [drawEnded, setDrawEnded] = useState(false)
 
   const wheelRef = useRef<HTMLDivElement>(null)
   const currentPrizeRef = useRef(0)
@@ -80,6 +82,31 @@ export function RouletteGame() {
     }, 100)
   }, [lastSegment])
 
+  // Check if draw time has passed and enable verification button after 5 seconds
+  useEffect(() => {
+    if (activeBets.length === 0) return
+
+    const interval = setInterval(() => {
+      const now = new Date()
+      activeBets.forEach((bet) => {
+        const drawTime = new Date(bet.drawTime)
+        const timeSinceDraw = now.getTime() - drawTime.getTime()
+        
+        // If 5 seconds have passed since draw time
+        if (timeSinceDraw >= 5000 && !drawEnded) {
+          setDrawEnded(true)
+          setCanCheckResult(true)
+          setHasScheduledDraw(false)
+          
+          // Auto-spin the wheel
+          handleSpin()
+        }
+      })
+    }, 1000) // Check every second
+
+    return () => clearInterval(interval)
+  }, [activeBets, drawEnded, handleSpin])
+
   const handleTransitionEnd = useCallback(() => {
     setIsAnimating(false)
     setHasSpunRecently(true)
@@ -102,6 +129,9 @@ export function RouletteGame() {
 
     // Reset after verification
     setHasSpunRecently(false)
+    setCanCheckResult(false)
+    setDrawEnded(false)
+    setActiveBets([]) // Clear active bets after verification
   }, [lastSegment, verificationResult])
 
   const handleBet = useCallback(
@@ -172,6 +202,7 @@ export function RouletteGame() {
             pendingVerification={pendingVerification}
             verificationResult={verificationResult}
             isDisabled={hasScheduledDraw}
+            canCheckResult={canCheckResult}
           />
         </div>
       </div>

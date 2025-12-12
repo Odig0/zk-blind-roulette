@@ -15,6 +15,7 @@ interface RouletteWheelProps {
   pendingVerification: boolean
   verificationResult: { segment: number; value: number } | null
   isDisabled?: boolean
+  canCheckResult?: boolean
 }
 
 export function RouletteWheel({
@@ -29,6 +30,7 @@ export function RouletteWheel({
   pendingVerification,
   verificationResult,
   isDisabled = false,
+  canCheckResult = false,
 }: RouletteWheelProps) {
   const prizeEmoji = verificationResult 
     ? verificationResult.value === -1 
@@ -73,12 +75,33 @@ export function RouletteWheel({
       <div className="flex flex-col gap-4 items-center">
         <Button
           onClick={onSpin}
-          disabled={isAnimating || pendingVerification}
+          disabled={isAnimating || pendingVerification || isDisabled}
           size="lg"
           className="text-xl px-12 py-6 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-bold shadow-lg shadow-orange-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isAnimating ? "SPINNING..." : "SPIN THE WHEEL"}
+          {isAnimating ? "SPINNING..." : isDisabled ? "SCHEDULED DRAW" : "SPIN THE WHEEL"}
         </Button>
+
+        {/* Verification button - shown when draw has ended (after 5 seconds) */}
+        {canCheckResult && !hasSpunRecently && !verificationResult && (
+          <div className="flex flex-col gap-3 items-center animate-in fade-in slide-in-from-bottom-4">
+            <div className="p-4 rounded-lg bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30">
+              <p className="text-sm text-purple-200 text-center mb-3">
+                🎰 The draw has ended! Check if you won:
+              </p>
+              <Button
+                onClick={onVerify}
+                size="lg"
+                className="w-full text-lg px-10 py-5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold shadow-lg shadow-purple-500/50"
+              >
+                🔍 CHECK IF I WON
+              </Button>
+              <p className="text-xs text-purple-300 text-center mt-2">
+                Only you will see the result
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Verification section - shown after spin completes */}
         {hasSpunRecently && !isAnimating && (
