@@ -1,24 +1,30 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { RouletteWheel } from "@/components/roulette/roulette-wheel"
 import { usePrivateRaffle } from "@/hooks/usePrivateRaffle"
 import { useRaffleData, useParticipantCount } from "@/hooks/usePrivateRaffle"
 import { BuyTicketModal } from "@/components/raffles/buy-ticket-modal"
 import { CheckWinnerCard } from "@/components/raffles/check-winner-card"
-import { ArrowLeft, Clock, Users, Ticket, Trophy, ShoppingCart } from "lucide-react"
+import { ArrowLeft, Clock, Users, Ticket, Trophy, ShoppingCart, Copy } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { formatEther } from "viem"
+import { useAccount } from "wagmi"
+import { useToast } from "@/hooks/use-toast"
+import Image from "next/image"
+
 
 export default function LiveRafflePage() {
   const params = useParams()
-  const raffleId = params.id as string
+  const raffleCode = params.id as string
+  const { address } = useAccount()
+  const { toast } = useToast()
   
-  // Por ahora usaremos el ID "0" si es "latest"
-  const currentRaffleId = raffleId === "latest" ? BigInt(0) : BigInt(raffleId)
+  // Por ahora usaremos el ID "0" si es "latest", o buscaremos el ID real del código
+  const [currentRaffleId, setCurrentRaffleId] = useState<bigint>(BigInt(0))
+  const [raffleData, setRaffleData] = useState<any>(null)
   
   const { drawWinner, isPending } = usePrivateRaffle()
   const { data: raffle } = useRaffleData(currentRaffleId)
@@ -27,31 +33,101 @@ export default function LiveRafflePage() {
   const [timeRemaining, setTimeRemaining] = useState<string>("")
   const [hasEnded, setHasEnded] = useState(false)
   const [showBuyTicket, setShowBuyTicket] = useState(false)
+  const [isSpinning, setIsSpinning] = useState(false)
+  const [rotation, setRotation] = useState(0)
+  const wheelRef = useRef<HTMLDivElement>(null)
 
+  // Fetch raffle data from Firebase
   useEffect(() => {
-    if (!raffle || !raffle.endTime) return
-
-    const endTime = Number(raffle.endTime) * 1000 // Convert to milliseconds
-    
-    const interval = setInterval(() => {
-      const now = Date.now()
-      const difference = endTime - now
-
-      if (difference <= 0) {
-        setTimeRemaining("Raffle ended!")
-        setHasEnded(true)
-        clearInterval(interval)
-      } else {
-        const hours = Math.floor(difference / (1000 * 60 * 60))
-        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
-        const seconds = Math.floor((difference % (1000 * 60)) / 1000)
+    const fetchRaffleData = async () => {
+      try {
+        const response = await fetch(`https://us-central1-raffero-58001.cloudfunctions.net/api/raffles/verify/${raffleCode}`)
+        const data = await response.json()
         
-        setTimeRemaining(`${hours}h ${minutes}m ${seconds}s`)
+        if (data.success && data.raffle) {
+          setRaffleData(data.raffle)
+          // Aquí podrías mapear el raffleCode a un raffleId real del contrato
+          // Por ahora usamos 0
+          setCurrentRaffleId(BigInt(0))
+        }
+      } catch (error) {
+        console.error('Error fetching raffle:', error)
       }
-    }, 1000)
+    }
+
+    if (raffleCode !== 'latest') {
+      fetchRaffleData()
+    }
+  }, [raffleCode])
+
+  const handleJoinRaffle = async () => {
+    if (!address) return
+    
+    try {
+      const response = await fetch('https://us-central1-raffero-58001.cloudfunctions.net/api/raffles/join', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          raffleCode: raffleCode,
+          userId: address,
+          walletAddress: address,
+        }),
+      })
+
+      const data = await response.json()
+      
+      if (data.raffleCode) {
+        toast({
+          title: "✅ Joined raffle!",
+          description: "You've been registered in Firebase",
+        })
+      }
+    } catch (error) {
+      console.error('Error joining raffle:', error)
+    }
+  }
+
+  const copyRaffleCode = () => {
+    navigator.clipboard.writeText(raffleCode)
+    toast({
+      title: "📋 Copied!",
+      description: "Raffle code copied to clipboard",
+    })
+  }
+
+  // Fetch tiempo restante desde Firebase API
+  useEffect(() => {
+    const fetchTimeRemaining = async () => {
+      try {
+        const response = await fetch(`https://us-central1-raffero-58001.cloudfunctions.net/api/raffles/time/${raffleCode}`)
+        const data = await response.json()
+        
+        if (data.success && data.timeRemaining) {
+          const { hours, minutes, seconds, totalSeconds } = data.timeRemaining
+          
+          if (totalSeconds <= 0) {
+            setTimeRemaining("Raffle ended!")
+            setHasEnded(true)
+          } else {
+            setTimeRemaining(`${hours}h ${minutes}m ${seconds}s`)
+            setHasEnded(false)
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching time:', error)
+      }
+    }
+
+    // Fetch inicial
+    fetchTimeRemaining()
+    
+    // Actualizar cada segundo
+    const interval = setInterval(fetchTimeRemaining, 1000)
 
     return () => clearInterval(interval)
-  }, [raffle])
+  }, [raffleCode])
 
   // Loading state
   if (!raffle) {
@@ -127,19 +203,60 @@ export default function LiveRafflePage() {
               <h2 className="text-3xl font-bold">Prize Wheel</h2>
             </div>
             
-            <div className="flex items-center justify-center">
-              <RouletteWheel />
+            <div className="flex items-center justify-center py-8">
+              {/* Roulette Wheel */}
+              <div className="relative w-96 h-96">
+                <div
+                  ref={wheelRef}
+                  className="w-full h-full"
+                  style={{
+                    transform: `rotate(${rotation}deg)`,
+                    transition: isSpinning ? "transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)" : "none",
+                  }}
+                >
+                  <Image
+                    src="/wheel.png"
+                    alt="Roulette Wheel"
+                    width={384}
+                    height={384}
+                    className="w-full h-full"
+                    priority
+                  />
+                </div>
+                
+                {/* Pointer */}
+                <div className="absolute -top-10 left-1/2 -translate-x-1/2 z-10">
+                  <div className="w-0 h-0 border-l-[24px] border-r-[24px] border-t-[48px] border-l-transparent border-r-transparent border-t-yellow-400 drop-shadow-2xl"></div>
+                </div>
+
+                {/* Outer glow */}
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-yellow-400/30 via-orange-500/30 to-red-500/30 animate-pulse blur-2xl -z-10"></div>
+              </div>
             </div>
 
             {hasEnded && (
               <div className="mt-6 space-y-4">
                 <Button
-                  onClick={() => drawWinner(currentRaffleId)}
-                  disabled={isPending || raffle.status !== 1} // 1 = Active
+                  onClick={async () => {
+                    // Spin animation
+                    setIsSpinning(true)
+                    const spins = 5 + Math.random() * 3 // 5-8 full rotations
+                    const finalDegree = Math.random() * 360
+                    setRotation(360 * spins + finalDegree)
+                    
+                    // Draw winner after animation starts
+                    await drawWinner(currentRaffleId)
+                    
+                    // Stop spinning after 4 seconds
+                    setTimeout(() => {
+                      setIsSpinning(false)
+                    }, 4000)
+                  }}
+                  disabled={isPending || isSpinning || raffle.status !== 0}
                   size="lg"
                   className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600"
                 >
-                  {isPending ? "Drawing Winner..." : "🎲 Draw Winner Now"}
+                  {isPending || isSpinning ? "🎰 Spinning..." : "🎲 Draw Winner Now"}
                 </Button>
                 <p className="text-sm text-muted-foreground text-center">
                   The raffle has ended. Click above to select the winner!
@@ -207,7 +324,10 @@ export default function LiveRafflePage() {
                 {/* Buy Ticket Button */}
                 {!hasEnded && raffle.status === 0 && (
                   <Button
-                    onClick={() => setShowBuyTicket(true)}
+                    onClick={() => {
+                      handleJoinRaffle()
+                      setShowBuyTicket(true)
+                    }}
                     size="lg"
                     className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
                   >
@@ -225,11 +345,19 @@ export default function LiveRafflePage() {
             <Card className="glass-card p-6 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/30">
               <h3 className="text-xl font-bold mb-3">📢 Share Your Raffle</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Invite people to join your raffle! Share this link or generate an invite code.
+                Share this code with others to join your raffle!
               </p>
-              <Button variant="outline" className="w-full">
-                Generate Invite Code
-              </Button>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={raffleCode}
+                  readOnly
+                  className="flex-1 px-4 py-2 rounded-lg bg-black/40 border border-purple-500/30 text-center font-mono text-lg"
+                />
+                <Button onClick={copyRaffleCode} variant="outline" size="icon">
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
             </Card>
           </div>
         </div>

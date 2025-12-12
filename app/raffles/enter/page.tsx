@@ -19,19 +19,26 @@ export default function EnterRafflePage() {
 
     setIsLoading(true)
     
-    // TODO: Llamar a tu API para verificar el código
-    // const response = await fetch('/api/raffles/verify-code', {
-    //   method: 'POST',
-    //   body: JSON.stringify({ code: inviteCode })
-    // })
-    
-    // Por ahora, simular verificación
-    setTimeout(() => {
-      // Redirigir a la raffle si el código es válido
-      // router.push(`/raffles/${raffleId}`)
+    try {
+      // Verificar código con la API
+      const response = await fetch(`https://us-central1-raffero-58001.cloudfunctions.net/api/raffles/verify/${inviteCode}`, {
+        method: 'GET',
+      })
+
+      const data = await response.json()
+
+      if (data.success && data.valid && data.canJoin) {
+        // Redirigir a la raffle
+        router.push(`/raffles/live/${inviteCode}`)
+      } else {
+        alert(`Invalid code or raffle is full. ${data.raffle ? `Spots: ${data.raffle.spotsAvailable}/${data.raffle.maxParticipants}` : ''}`)
+      }
+    } catch (error) {
+      console.error('Error verifying code:', error)
+      alert('Error verifying invite code. Please try again.')
+    } finally {
       setIsLoading(false)
-      alert(`Código: ${inviteCode} - API pendiente de implementar`)
-    }, 1000)
+    }
   }
 
   return (

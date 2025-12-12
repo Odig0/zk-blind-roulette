@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Loader2 } from "lucide-react"
+import { Loader2, X } from "lucide-react"
 import { usePrivateRaffle, useComputeHash } from "@/hooks/usePrivateRaffle"
 import { generateSecret, generateNullifier, saveTicket } from "@/lib/zk-utils"
 import { formatEther } from "viem"
@@ -12,10 +12,12 @@ import { useToast } from "@/hooks/use-toast"
 interface BuyTicketModalProps {
   raffleId: bigint
   ticketPrice: bigint
+  isOpen: boolean
+  onClose: () => void
   onSuccess?: () => void
 }
 
-export function BuyTicketModal({ raffleId, ticketPrice, onSuccess }: BuyTicketModalProps) {
+export function BuyTicketModal({ raffleId, ticketPrice, isOpen, onClose, onSuccess }: BuyTicketModalProps) {
   const [step, setStep] = useState<"generate" | "computing" | "purchasing">("generate")
   const [secret, setSecret] = useState<bigint>()
   const [nullifier, setNullifier] = useState<bigint>()
@@ -52,9 +54,18 @@ export function BuyTicketModal({ raffleId, ticketPrice, onSuccess }: BuyTicketMo
         description: "Your ticket has been saved securely. Good luck!",
       })
 
+      // Cerrar modal y resetear
+      setTimeout(() => {
+        onClose()
+        setStep("generate")
+        setSecret(undefined)
+        setNullifier(undefined)
+        setCommitment(undefined)
+      }, 2000)
+
       onSuccess?.()
     }
-  }, [isSuccess, commitment, secret, nullifier, raffleId, toast, onSuccess])
+  }, [isSuccess, commitment, secret, nullifier, raffleId, toast, onSuccess, onClose])
 
   const handleGenerateAndBuy = () => {
     // Generar secret y nullifier
@@ -77,9 +88,20 @@ export function BuyTicketModal({ raffleId, ticketPrice, onSuccess }: BuyTicketMo
     await purchaseTicket(raffleId, commitment, ticketPrice)
   }
 
+  if (!isOpen) return null
+
   return (
-    <Card className="glass-card p-6 space-y-4">
-      <h3 className="text-xl font-bold neon-gradient-text">Buy Private Ticket</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+      <Card className="glass-card p-6 space-y-4 max-w-md w-full relative">
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <X className="h-5 w-5" />
+        </button>
+
+        <h3 className="text-xl font-bold neon-gradient-text">Buy Private Ticket</h3>
 
       <div className="space-y-3">
         <div className="flex justify-between text-sm">
@@ -142,5 +164,6 @@ export function BuyTicketModal({ raffleId, ticketPrice, onSuccess }: BuyTicketMo
         </p>
       </div>
     </Card>
+    </div>
   )
 }

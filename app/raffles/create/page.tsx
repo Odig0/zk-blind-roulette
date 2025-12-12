@@ -44,22 +44,62 @@ export default function CreateRafflePage() {
   // Redirigir solo cuando la transacción se confirme
   useEffect(() => {
     if (isConfirmed && hash) {
-      toast({
-        title: "🎉 Raffle Created!",
-        description: "Redirecting to your raffle...",
-      })
-      
-      // Obtener el raffleId del evento (por ahora usaremos el hash como identificador temporal)
-      // En producción, deberías obtener el raffleId del evento emitido
-      const raffleId = "latest" // Cambiaremos esto para obtener el ID real del evento
-      
-      const timer = setTimeout(() => {
-        router.push(`/raffles/live/${raffleId}`)
-      }, 1500)
+      // Registrar la raffle en Firebase
+      const registerRaffle = async () => {
+        try {
+          // console.log('🔥 Sending:', {
+          //   ticketPrice: parseFloat(ticketPrice),
+          //   initialPrize: parseFloat(prizeAmount),
+          //   maxParticipants: parseInt(levels),
+          //   duration: parseInt(duration),
+          // })
 
-      return () => clearTimeout(timer)
+          const response = await fetch('https://us-central1-raffero-58001.cloudfunctions.net/api/raffles/create', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              ticketPrice: parseFloat(ticketPrice),
+              initialPrize: parseFloat(prizeAmount),
+              maxParticipants: parseInt(levels),
+              duration: parseInt(duration),
+            }),
+          })
+
+          // console.log('📡 Response status:', response.status)
+          const data = await response.json()
+          // console.log('📦 Response data:', data)
+
+          if (data.success && data.raffleCode) {
+            toast({
+              title: "🎉 Raffle Created!",
+              description: `Your raffle code is: ${data.raffleCode}`,
+            })
+
+            setTimeout(() => {
+              router.push(`/raffles/live/${data.raffleCode}`)
+            }, 1500)
+          } else {
+            throw new Error(data.message || 'Failed to register raffle')
+          }
+        } catch (error) {
+          // console.error('❌ Error registering raffle:', error)
+          toast({
+            title: "⚠️ Raffle created on-chain",
+            description: "But failed to register in database.",
+            variant: "destructive",
+          })
+          
+          setTimeout(() => {
+            router.push(`/raffles/live/latest`)
+          }, 2000)
+        }
+      }
+
+      registerRaffle()
     }
-  }, [isConfirmed, hash, toast, router])
+  }, [isConfirmed, hash, ticketPrice, prizeAmount, levels, duration, toast, router])
 
   if (!isConnected) {
     return (
