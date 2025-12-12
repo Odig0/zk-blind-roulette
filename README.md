@@ -18,6 +18,8 @@ Players enter scheduled draws with one tap, watch the roulette wheel spin automa
 
 ## 🏗️ Deployed Contracts (Scroll Sepolia)
 
+> **Smart Contracts Source**: The blockchain contracts for this project are available at [zk-blind-roulette-blockchain](https://github.com/DavidZapataOh/zk-blind-roulette-blockchain)
+
 | Contract | Address | Explorer |
 |----------|---------|----------|
 | **PrivateRaffle** | `0x46aa91f8f0f52471fdea6481cf5027ee839ebb69` | [View](https://sepolia.scrollscan.com/address/0x46aa91f8f0f52471fdea6481cf5027ee839ebb69#code) |
