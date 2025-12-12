@@ -1,36 +1,11 @@
-import { http, createConfig } from "wagmi"
+import { getDefaultConfig } from "@rainbow-me/rainbowkit"
 import { sepolia, mainnet, polygon, arbitrum, optimism, base, scrollSepolia } from "wagmi/chains"
-import { injected, walletConnect, metaMask, coinbaseWallet } from "wagmi/connectors"
 
-// Wagmi configuration with multiple chains
-export const config = createConfig({
+// Wagmi configuration with RainbowKit
+export const config = getDefaultConfig({
+  appName: "Raffero",
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "be88688ad24de3cfd8fb53eb789cd647",
   chains: [scrollSepolia, sepolia, mainnet, polygon, arbitrum, optimism, base],
-  connectors: [
-    injected(),
-    walletConnect({ 
-      projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
-      showQrModal: true,
-      metadata: {
-        name: "Raffero",
-        description: "Anonymous Raffle System",
-        url: "https://zk-blind-roulette.vercel.app",
-        icons: ["https://zk-blind-roulette.vercel.app/logoEnaid.png"]
-      },
-      qrModalOptions: {
-        themeMode: 'dark' as const,
-      },
-    }),
-    metaMask(),
-    coinbaseWallet({ appName: "Raffero" }),
-  ],
-  transports: {
-    [scrollSepolia.id]: http(),
-    [sepolia.id]: http(),
-    [mainnet.id]: http(),
-    [polygon.id]: http(),
-    [arbitrum.id]: http(),
-    [optimism.id]: http(),
-    [base.id]: http(),
-  },
   ssr: true,
 })
+
