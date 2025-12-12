@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { usePrivateRaffle } from "@/hooks/usePrivateRaffle"
 import { parseEther } from "viem"
-import { Loader2, Rocket, Info, ArrowLeft } from "lucide-react"
+import { Loader2, Rocket, Info, ArrowLeft, Copy, Check } from "lucide-react"
 import { useAccount } from "wagmi"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
@@ -24,6 +24,8 @@ export default function CreateRafflePage() {
   const [levels, setLevels] = useState("4")
   const [duration, setDuration] = useState("3600")
   const [prizeAmount, setPrizeAmount] = useState("0.01")
+  const [raffleCode, setRaffleCode] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
 
   const { createRaffle, isPending, isSuccess, hash } = usePrivateRaffle()
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash })
@@ -72,14 +74,11 @@ export default function CreateRafflePage() {
           // console.log('📦 Response data:', data)
 
           if (data.success && data.raffleCode) {
+            setRaffleCode(data.raffleCode)
             toast({
-              title: "🎉 Raffle Created!",
-              description: `Your raffle code is: ${data.raffleCode}`,
+              title: "🎉 Raffle Created Successfully!",
+              description: "Share your raffle code with friends to let them join!",
             })
-
-            setTimeout(() => {
-              router.push(`/raffles/live/${data.raffleCode}`)
-            }, 1500)
           } else {
             throw new Error(data.message || 'Failed to register raffle')
           }
@@ -100,6 +99,89 @@ export default function CreateRafflePage() {
       registerRaffle()
     }
   }, [isConfirmed, hash, ticketPrice, prizeAmount, levels, duration, toast, router])
+
+  const copyToClipboard = () => {
+    if (raffleCode) {
+      navigator.clipboard.writeText(raffleCode)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  const goToRaffle = () => {
+    if (raffleCode) {
+      router.push(`/raffles/live/${raffleCode}`)
+    }
+  }
+
+  // Show success screen with raffle code
+  if (raffleCode) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 py-20">
+        {/* Background */}
+        <div className="fixed inset-0 -z-10 overflow-hidden">
+          <div className="absolute -top-48 -left-48 w-[600px] h-[600px] bg-gradient-to-br from-purple-900/60 via-cyan-700/40 to-transparent rounded-full blur-[120px] animate-pulse-glow" />
+          <div className="absolute -bottom-48 -right-48 w-[700px] h-[700px] bg-gradient-to-tl from-orange-500/60 via-yellow-400/50 to-transparent rounded-full blur-[120px] animate-pulse-glow" />
+        </div>
+
+        <Card className="glass-card p-8 md:p-12 max-w-2xl w-full text-center space-y-6 animate-in fade-in slide-in-from-bottom-4">
+          <div className="text-6xl mb-4">🎉</div>
+          <h1 className="text-4xl md:text-5xl font-bold neon-gradient-text mb-4">
+            Raffle Created Successfully!
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+            Your raffle is now live! Share this unique code with your friends so they can join and participate.
+          </p>
+
+          <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-2 border-purple-500/50 rounded-xl p-6 space-y-3">
+            <p className="text-sm font-medium text-purple-300 uppercase tracking-wider">
+              Your Raffle Code
+            </p>
+            <div className="flex items-center justify-center gap-3">
+              <code className="text-3xl md:text-4xl font-bold font-mono neon-gradient-text tracking-wider">
+                {raffleCode}
+              </code>
+              <Button
+                onClick={copyToClipboard}
+                variant="outline"
+                size="icon"
+                className="h-12 w-12"
+              >
+                {copied ? <Check className="h-5 w-5 text-green-400" /> : <Copy className="h-5 w-5" />}
+              </Button>
+            </div>
+            {copied && (
+              <p className="text-sm text-green-400 animate-in fade-in">
+                ✓ Copied to clipboard!
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            <Button
+              onClick={goToRaffle}
+              size="lg"
+              className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-lg h-14"
+            >
+              View Live Raffle
+            </Button>
+            <Button
+              onClick={() => router.push('/')}
+              variant="outline"
+              size="lg"
+              className="flex-1 text-lg h-14"
+            >
+              Back to Home
+            </Button>
+          </div>
+
+          <p className="text-xs text-muted-foreground mt-6">
+            💡 Tip: Anyone with this code can join your raffle. Keep it safe or share it widely!
+          </p>
+        </Card>
+      </div>
+    )
+  }
 
   if (!isConnected) {
     return (
